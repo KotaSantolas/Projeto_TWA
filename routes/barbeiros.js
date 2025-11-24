@@ -3,31 +3,30 @@
 const express = require('express');
 const router = express.Router();
 const barbeiroController = require('../controllers/barbeiroController');
-const upload = require('../middleware/upload'); // Importa o middleware de upload
+const upload = require('../middleware/upload');
+const { requireAuth } = require('../middleware/auth');
 
-// Rotas para a entidade Barbeiros
-// A rota POST usa o middleware 'upload.single('foto')' para processar a foto.
+// Todas as rotas de barbeiros requerem autenticação
 
 // GET /barbeiros - Lista todos os barbeiros
-router.get('/', barbeiroController.index);
+router.get('/', requireAuth, barbeiroController.index);
 
-// GET /barbeiros/create - Formulário para criar novo barbeiro
-router.get('/create', barbeiroController.getCreateForm);
+// GET /barbeiros/create - Formulário para criar
+router.get('/create', requireAuth, barbeiroController.getCreateForm);
 
-// POST /barbeiros - Cria novo barbeiro (com upload de foto)
-router.post('/', upload.single('foto'), barbeiroController.create);
+// POST /barbeiros - Criar novo barbeiro (com upload)
+router.post('/', requireAuth, upload.single('foto'), barbeiroController.create);
 
-// GET /barbeiros/:id/edit - Formulário para editar barbeiro
-router.get('/:id/edit', barbeiroController.getEditForm);
+// GET /barbeiros/:id/edit - Formulário para editar
+router.get('/:id/edit', requireAuth, barbeiroController.getEditForm);
 
-// POST /barbeiros/:id - Atualiza barbeiro (usa POST para edição/atualização, com método override ou PUT)
-// Aqui estamos a usar POST e re-processamos o upload para novas fotos
-router.post('/:id', upload.single('foto'), barbeiroController.update);
+// POST /barbeiros/:id - Atualizar barbeiro (com upload)
+router.post('/:id', requireAuth, upload.single('foto'), barbeiroController.update);
 
-// GET /barbeiros/:id - Detalhes de um barbeiro
-router.get('/:id', barbeiroController.show);
+// DELETE /barbeiros/:id - Remover barbeiro
+router.delete('/:id', requireAuth, barbeiroController.delete);
 
-// DELETE /barbeiros/:id - Remove barbeiro
-router.delete('/:id', barbeiroController.delete);
+// GET /barbeiros/:id - Detalhes do barbeiro
+router.get('/:id', requireAuth, barbeiroController.show);
 
 module.exports = router;
