@@ -51,7 +51,7 @@ const Servico = {
     delete: async (id) => {
         const [result] = await db.execute('DELETE FROM servicos WHERE id = ?', [id]);
         return result.affectedRows;
-    },
+    }
 };
 
 module.exports = Servico;

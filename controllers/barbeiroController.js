@@ -2,6 +2,7 @@
 
 const Barbeiro = require('../models/Barbeiro');
 const fs = require('fs/promises'); // Para apagar arquivos
+const path = require('path');
 
 const barbeiroController = {
     // 1. CREATE (Processa o formulário POST)
