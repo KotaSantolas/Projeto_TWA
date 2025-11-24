@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= servico ? 'Editar Serviço' : 'Adicionar Serviço'
+    a.btn.btn-primary(href='/servicos') Voltar
+  
+  .card
+    form(action=servico ? `/servicos/${servico.id}` : '/servicos', method='POST')
+      .form-group
+        label(for='nome') Nome *
+        input#nome(type='text', name='nome', value=servico && servico.nome || '', required)
+      
+      .form-group
+        label(for='descricao') Descrição
+        textarea#descricao(name='descricao', rows='3')= servico && servico.descricao || ''
+      
+      .form-group
+        label(for='duracao_min') Duração (minutos) *
+        input#duracao_min(type='number', name='duracao_min', value=servico && servico.duracao_min || '', min='1', required)
+      
+      .form-group
+        label(for='preco') Preço (€) *
+        input#preco(type='number', name='preco', value=servico && servico.preco || '', min='0', step='0.01', required)
+      
+      if servico
+        .form-group
+          label(for='estado') Estado
+          select#estado(name='estado')
+            option(value='ativo', selected=servico.estado === 'ativo') Ativo
+            option(value='inativo', selected=servico.estado === 'inativo') Inativo
+      
+      button.btn.btn-success(type='submit')= servico ? 'Atualizar' : 'Criar'

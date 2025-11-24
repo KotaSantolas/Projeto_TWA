@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+  .page-header
+    h1 Clientes
+    a.btn.btn-success(href='/clientes/create') + Adicionar Cliente
+  
+  .card
+    if clientes.length === 0
+      p Nenhum cliente registado.
+    else
+      table
+        thead
+          tr
+            th Nome
+            th Email
+            th Telefone
+            th Ações
+        tbody
+          each cliente in clientes
+            tr
+              td= cliente.nome
+              td= cliente.email
+              td= cliente.telefone || '-'
+              td.actions
+                a.btn.btn-primary(href=`/clientes/${cliente.id}`) Ver
+                a.btn.btn-secondary(href=`/clientes/${cliente.id}/edit`) Editar
+                button.btn.btn-danger(onclick=`deleteItem('/clientes/${cliente.id}', 'Remover este cliente?')`) Remover

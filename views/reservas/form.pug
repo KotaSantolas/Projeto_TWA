@@ -1,0 +1,50 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= reserva ? 'Editar Reserva' : 'Nova Reserva'
+    a.btn.btn-primary(href='/reservas') Voltar
+  
+  .card
+    form(action=reserva ? `/reservas/${reserva.id}` : '/reservas', method='POST')
+      if !reserva
+        .form-group
+          label(for='cliente_id') Cliente *
+          select#cliente_id(name='cliente_id', required)
+            option(value='') Selecione um cliente
+            each cliente in clientes
+              option(value=cliente.id)= cliente.nome
+      
+      .form-group
+        label(for='barbeiro_id') Barbeiro *
+        select#barbeiro_id(name='barbeiro_id', required)
+          option(value='') Selecione um barbeiro
+          each barbeiro in barbeiros
+            option(value=barbeiro.id, selected=reserva && reserva.barbeiro_id == barbeiro.id)= barbeiro.nome
+      
+      .form-group
+        label(for='servico_id') Serviço *
+        select#servico_id(name='servico_id', required)
+          option(value='') Selecione um serviço
+          each servico in servicos
+            option(value=servico.id, selected=reserva && reserva.servico_id == servico.id)= servico.nome + ' - ' + servico.duracao_min + 'min - €' + servico.preco
+      
+      .form-group
+        label(for='data_hora') Data e Hora *
+        input#data_hora(type='datetime-local', name='data_hora', value=reserva && reserva.data_hora || '', required)
+      
+      if reserva
+        .form-group
+          label(for='estado') Estado
+          select#estado(name='estado')
+            option(value='pendente', selected=reserva.estado === 'pendente') Pendente
+            option(value='confirmada', selected=reserva.estado === 'confirmada') Confirmada
+            option(value='concluída', selected=reserva.estado === 'concluída') Concluída
+            option(value='cancelada', selected=reserva.estado === 'cancelada') Cancelada
+            option(value='não_compareceu', selected=reserva.estado === 'não_compareceu') Não Compareceu
+      
+      .form-group
+        label(for='observacoes') Observações
+        textarea#observacoes(name='observacoes', rows='3')= reserva && reserva.observacoes || ''
+      
+      button.btn.btn-success(type='submit')= reserva ? 'Atualizar' : 'Criar'

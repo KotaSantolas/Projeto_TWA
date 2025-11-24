@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .page-header
+    h1 Dashboard
+    p Bem-vindo, #{currentUser.nome}!
+  
+  .dashboard-grid
+    .dashboard-card
+      h2 👥
+      p Clientes
+      a(href='/clientes') Ver todos
+    
+    .dashboard-card
+      h2 ✂️
+      p Barbeiros
+      a(href='/barbeiros') Ver todos
+    
+    .dashboard-card
+      h2 💈
+      p Serviços
+      a(href='/servicos') Ver todos
+    
+    .dashboard-card
+      h2 📅
+      p Reservas
+      a(href='/reservas') Ver todas

@@ -1,0 +1,30 @@
+doctype html
+html(lang='pt')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title Login - Barbearia
+    link(rel='stylesheet', href='/css/style.css')
+  body.auth-page
+    .auth-container
+      .auth-box
+        h1 Login
+        p.subtitle Gestão de Barbearia
+        
+        if error
+          .alert.alert-error= error
+        
+        form(action='/auth/login', method='POST')
+          .form-group
+            label(for='email') Email
+            input#email(type='email', name='email', value=email || '', required)
+          
+          .form-group
+            label(for='password') Password
+            input#password(type='password', name='password', required)
+          
+          button.btn.btn-primary(type='submit') Entrar
+        
+        p.auth-link
+          | Não tens conta? 
+          a(href='/auth/register') Registar

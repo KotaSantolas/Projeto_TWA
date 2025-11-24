@@ -1,0 +1,27 @@
+doctype html
+html(lang='pt')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title= title || 'Gestão Barbearia'
+    link(rel='stylesheet', href='/css/style.css')
+  body
+    if currentUser
+      nav.navbar
+        .container
+          h1.logo Barbearia
+          ul.nav-links
+            li: a(href='/') Dashboard
+            li: a(href='/clientes') Clientes
+            li: a(href='/barbeiros') Barbeiros
+            li: a(href='/servicos') Serviços
+            li: a(href='/reservas') Reservas
+            li: a(href='/auth/logout') Sair
+    
+    main.container
+      if error
+        .alert.alert-error= error
+      
+      block content
+    
+    script(src='/js/main.js')

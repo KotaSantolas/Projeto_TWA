@@ -1,0 +1,43 @@
+doctype html
+html(lang='pt')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title Registar - Barbearia
+    link(rel='stylesheet', href='/css/style.css')
+  body.auth-page
+    .auth-container
+      .auth-box
+        h1 Registar
+        p.subtitle Cria a tua conta
+        
+        if error
+          .alert.alert-error= error
+        
+        form(action='/auth/register', method='POST')
+          .form-group
+            label(for='nome') Nome Completo
+            input#nome(type='text', name='nome', value=cliente && cliente.nome || '', required)
+          
+          .form-group
+            label(for='email') Email
+            input#email(type='email', name='email', value=cliente && cliente.email || '', required)
+          
+          .form-group
+            label(for='telefone') Telefone
+            input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '')
+          
+          .form-group
+            label(for='password') Password
+            input#password(type='password', name='password', required, minlength='6')
+            small Mínimo 6 caracteres
+          
+          .form-group
+            label(for='password_confirm') Confirmar Password
+            input#password_confirm(type='password', name='password_confirm', required)
+          
+          button.btn.btn-primary(type='submit') Registar
+        
+        p.auth-link
+          | Já tens conta? 
+          a(href='/auth/login') Entrar

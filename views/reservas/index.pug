@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+  .page-header
+    h1 Reservas
+    a.btn.btn-success(href='/reservas/create') + Nova Reserva
+  
+  .card
+    if reservas.length === 0
+      p Nenhuma reserva registada.
+    else
+      table
+        thead
+          tr
+            th Data/Hora
+            th Cliente
+            th Barbeiro
+            th Serviço
+            th Estado
+            th Ações
+        tbody
+          each reserva in reservas
+            tr
+              td= new Date(reserva.data_hora).toLocaleString('pt-PT')
+              td= reserva.cliente_nome
+              td= reserva.barbeiro_nome
+              td= reserva.servico_nome
+              td= reserva.estado
+              td.actions
+                a.btn.btn-primary(href=`/reservas/${reserva.id}`) Ver
+                a.btn.btn-secondary(href=`/reservas/${reserva.id}/edit`) Editar
+                button.btn.btn-danger(onclick=`deleteItem('/reservas/${reserva.id}', 'Remover esta reserva?')`) Remover

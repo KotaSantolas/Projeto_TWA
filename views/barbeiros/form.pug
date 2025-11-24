@@ -1,0 +1,38 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= barbeiro ? 'Editar Barbeiro' : 'Adicionar Barbeiro'
+    a.btn.btn-primary(href='/barbeiros') Voltar
+  
+  .card
+    form(action=barbeiro ? `/barbeiros/${barbeiro.id}` : '/barbeiros', method='POST', enctype='multipart/form-data')
+      .form-group
+        label(for='nome') Nome *
+        input#nome(type='text', name='nome', value=barbeiro && barbeiro.nome || '', required)
+      
+      .form-group
+        label(for='email') Email *
+        input#email(type='email', name='email', value=barbeiro && barbeiro.email || '', required)
+      
+      .form-group
+        label(for='telefone') Telefone
+        input#telefone(type='tel', name='telefone', value=barbeiro && barbeiro.telefone || '')
+      
+      if !barbeiro
+        .form-group
+          label(for='password') Password *
+          input#password(type='password', name='password', required, minlength='6')
+          small Mínimo 6 caracteres
+      
+      .form-group
+        label(for='foto') Foto
+        input#foto(type='file', name='foto', accept='image/*')
+        if barbeiro && barbeiro.foto_url
+          div(style='margin-top: 1rem;')
+            img.image-preview(src=barbeiro.foto_url, alt='Foto atual')
+            div
+              input(type='checkbox', name='remover_foto', id='remover_foto')
+              label(for='remover_foto', style='display: inline; margin-left: 0.5rem;') Remover foto
+      
+      button.btn.btn-success(type='submit')= barbeiro ? 'Atualizar' : 'Criar'

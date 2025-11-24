@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= cliente ? 'Editar Cliente' : 'Adicionar Cliente'
+    a.btn.btn-primary(href='/clientes') Voltar
+  
+  .card
+    form(action=cliente ? `/clientes/${cliente.id}` : '/clientes', method='POST')
+      .form-group
+        label(for='nome') Nome *
+        input#nome(type='text', name='nome', value=cliente && cliente.nome || '', required)
+      
+      .form-group
+        label(for='email') Email *
+        input#email(type='email', name='email', value=cliente && cliente.email || '', required)
+      
+      .form-group
+        label(for='telefone') Telefone
+        input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '')
+      
+      if !cliente
+        .form-group
+          label(for='password') Password *
+          input#password(type='password', name='password', required, minlength='6')
+          small Mínimo 6 caracteres
+      
+      button.btn.btn-success(type='submit')= cliente ? 'Atualizar' : 'Criar'

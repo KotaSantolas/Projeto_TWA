@@ -1,0 +1,26 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= cliente.nome
+    .actions
+      a.btn.btn-secondary(href=`/clientes/${cliente.id}/edit`) Editar
+      button.btn.btn-danger(onclick=`deleteItem('/clientes/${cliente.id}', 'Remover este cliente?')`) Remover
+      a.btn.btn-primary(href='/clientes') Voltar
+  
+  .card
+    .detail-item
+      span.detail-label ID
+      span.detail-value= cliente.id
+    
+    .detail-item
+      span.detail-label Nome
+      span.detail-value= cliente.nome
+    
+    .detail-item
+      span.detail-label Email
+      span.detail-value= cliente.email
+    
+    .detail-item
+      span.detail-label Telefone
+      span.detail-value= cliente.telefone || 'Não informado'

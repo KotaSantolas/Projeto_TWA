@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= barbeiro.nome
+    .actions
+      a.btn.btn-secondary(href=`/barbeiros/${barbeiro.id}/edit`) Editar
+      button.btn.btn-danger(onclick=`deleteItem('/barbeiros/${barbeiro.id}', 'Remover este barbeiro?')`) Remover
+      a.btn.btn-primary(href='/barbeiros') Voltar
+  
+  .card
+    if barbeiro.foto_url
+      .detail-item
+        span.detail-label Foto
+        div
+          img.image-preview(src=barbeiro.foto_url, alt=barbeiro.nome)
+    
+    .detail-item
+      span.detail-label ID
+      span.detail-value= barbeiro.id
+    
+    .detail-item
+      span.detail-label Nome
+      span.detail-value= barbeiro.nome
+    
+    .detail-item
+      span.detail-label Email
+      span.detail-value= barbeiro.email
+    
+    .detail-item
+      span.detail-label Telefone
+      span.detail-value= barbeiro.telefone || 'Não informado'

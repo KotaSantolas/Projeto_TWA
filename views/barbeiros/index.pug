@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  .page-header
+    h1 Barbeiros
+    a.btn.btn-success(href='/barbeiros/create') + Adicionar Barbeiro
+  
+  .card
+    if barbeiros.length === 0
+      p Nenhum barbeiro registado.
+    else
+      table
+        thead
+          tr
+            th Foto
+            th Nome
+            th Ações
+        tbody
+          each barbeiro in barbeiros
+            tr
+              td
+                if barbeiro.foto_url
+                  img.image-preview(src=barbeiro.foto_url, alt=barbeiro.nome, style='max-width: 50px;')
+                else
+                  | -
+              td= barbeiro.nome
+              td.actions
+                a.btn.btn-primary(href=`/barbeiros/${barbeiro.id}`) Ver
+                a.btn.btn-secondary(href=`/barbeiros/${barbeiro.id}/edit`) Editar
+                button.btn.btn-danger(onclick=`deleteItem('/barbeiros/${barbeiro.id}', 'Remover este barbeiro?')`) Remover

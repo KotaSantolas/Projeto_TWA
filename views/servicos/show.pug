@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+  .page-header
+    h1= servico.nome
+    .actions
+      a.btn.btn-secondary(href=`/servicos/${servico.id}/edit`) Editar
+      button.btn.btn-danger(onclick=`deleteItem('/servicos/${servico.id}', 'Remover este serviço?')`) Remover
+      a.btn.btn-primary(href='/servicos') Voltar
+  
+  .card
+    .detail-item
+      span.detail-label ID
+      span.detail-value= servico.id
+    
+    .detail-item
+      span.detail-label Nome
+      span.detail-value= servico.nome
+    
+    .detail-item
+      span.detail-label Descrição
+      span.detail-value= servico.descricao || 'Sem descrição'
+    
+    .detail-item
+      span.detail-label Duração
+      span.detail-value= servico.duracao_min + ' minutos'
+    
+    .detail-item
+      span.detail-label Preço
+      span.detail-value= '€' + servico.preco
+    
+    .detail-item
+      span.detail-label Estado
+      span.detail-value= servico.estado === 'ativo' ? '✅ Ativo' : '❌ Inativo'

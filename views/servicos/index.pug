@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  .page-header
+    h1 Serviços
+    a.btn.btn-success(href='/servicos/create') + Adicionar Serviço
+  
+  .card
+    if servicos.length === 0
+      p Nenhum serviço registado.
+    else
+      table
+        thead
+          tr
+            th Nome
+            th Duração (min)
+            th Preço (€)
+            th Estado
+            th Ações
+        tbody
+          each servico in servicos
+            tr
+              td= servico.nome
+              td= servico.duracao_min
+              td= servico.preco
+              td= servico.estado === 'ativo' ? '✅ Ativo' : '❌ Inativo'
+              td.actions
+                a.btn.btn-primary(href=`/servicos/${servico.id}`) Ver
+                a.btn.btn-secondary(href=`/servicos/${servico.id}/edit`) Editar
+                button.btn.btn-danger(onclick=`deleteItem('/servicos/${servico.id}', 'Remover este serviço?')`) Remover
