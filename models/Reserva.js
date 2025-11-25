@@ -27,9 +27,9 @@ const Reserva = {
     },
 
     // CREATE: Cria uma nova reserva
-    create: async (cliente_id, barbeiro_id, servico_id, data_hora, observacoes) => {
+    create: async (cliente_id, barbeiro_id, opcao_id, data_hora, observacoes) => {
         const sql = 'INSERT INTO reservas (cliente_id, barbeiro_id, opcao_id, data_hora, observacoes) VALUES (?, ?, ?, ?, ?)';
-        const [result] = await db.execute(sql, [cliente_id, barbeiro_id, servico_id, data_hora, observacoes]);
+        const [result] = await db.execute(sql, [cliente_id, barbeiro_id, opcao_id, data_hora, observacoes]);
         return result.insertId;
     },
 
@@ -38,9 +38,10 @@ const Reserva = {
         const sql = `
             SELECT 
                 r.id, r.data_hora, r.estado, r.observacoes, r.criado_em AS created_at, r.atualizado_em AS updated_at,
+                r.cliente_id, r.barbeiro_id, r.opcao_id,
                 CONCAT(c.primeiro_nome, ' ', c.ultimo_nome) AS cliente_nome, c.email AS cliente_email,
                 CONCAT(b.primeiro_nome, ' ', b.ultimo_nome) AS barbeiro_nome, b.fotografia AS barbeiro_foto,
-                s.nome AS servico_nome, s.duracao_min, s.preco
+                s.nome_opcao AS servico_nome, s.duracao_min, s.preco
             FROM reservas r
             JOIN clientes c ON r.cliente_id = c.id
             JOIN barbeiros b ON r.barbeiro_id = b.id
@@ -58,7 +59,7 @@ const Reserva = {
                 r.id, r.data_hora, r.estado,
                 CONCAT(c.primeiro_nome, ' ', c.ultimo_nome) AS cliente_nome,
                 CONCAT(b.primeiro_nome, ' ', b.ultimo_nome) AS barbeiro_nome,
-                s.nome AS servico_nome
+                s.nome_opcao AS servico_nome
             FROM reservas r
             JOIN clientes c ON r.cliente_id = c.id
             JOIN barbeiros b ON r.barbeiro_id = b.id
@@ -96,9 +97,9 @@ const Reserva = {
     },
 
     // UPDATE: Atualiza o estado ou dados da reserva
-    update: async (id, data_hora, barbeiro_id, servico_id, estado, observacoes) => {
+    update: async (id, data_hora, barbeiro_id, opcao_id, estado, observacoes) => {
         const sql = 'UPDATE reservas SET data_hora = ?, barbeiro_id = ?, opcao_id = ?, estado = ?, observacoes = ? WHERE id = ?';
-        const [result] = await db.execute(sql, [data_hora, barbeiro_id, servico_id, estado, observacoes, id]);
+        const [result] = await db.execute(sql, [data_hora, barbeiro_id, opcao_id, estado, observacoes, id]);
         return result.affectedRows;
     },
 

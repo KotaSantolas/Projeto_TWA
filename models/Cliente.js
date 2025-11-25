@@ -24,7 +24,7 @@ const Cliente = {
     create: async (primeiro_nome, ultimo_nome, email, password, telefone) => {
         const palavra_passe = await bcrypt.hash(password, 10);
         const sql = 'INSERT INTO clientes (primeiro_nome, ultimo_nome, email, palavra_passe, telefone) VALUES (?, ?, ?, ?, ?)';
-        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, palavra_passe, telefone || '']);
+        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, palavra_passe, telefone]);
         return result.insertId;
     },
 
@@ -57,7 +57,7 @@ const Cliente = {
     // UPDATE: Atualiza os dados do cliente
     update: async (id, primeiro_nome, ultimo_nome, email, telefone) => {
         const sql = 'UPDATE clientes SET primeiro_nome = ?, ultimo_nome = ?, email = ?, telefone = ? WHERE id = ?';
-        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, telefone || '', id]);
+        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, telefone, id]);
         return result.affectedRows;
     },
 

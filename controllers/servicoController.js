@@ -26,7 +26,7 @@ const servicoController = {
                 return res.status(404).render('error', { message: 'Serviço não encontrado' });
             }
             res.render('servicos/show', { 
-                title: `Serviço: ${servico.nome}`,
+                title: `Serviço: ${servico.nome_opcao}`,
                 servico 
             });
         } catch (error) {
@@ -46,9 +46,9 @@ const servicoController = {
 
     // CREATE - Cria novo serviço
     create: async (req, res) => {
-        const { nome, descricao, duracao_min, preco } = req.body;
+        const { nome_opcao, descricao, duracao_min, preco } = req.body;
 
-        if (!nome || !duracao_min || !preco) {
+        if (!nome_opcao || !duracao_min || !preco) {
             return res.render('servicos/form', { 
                 title: 'Adicionar Serviço',
                 error: 'Preencha todos os campos obrigatórios',
@@ -65,13 +65,18 @@ const servicoController = {
         }
 
         try {
-            const id = await Servico.create(nome, descricao, duracao_min, preco);
+            const id = await Servico.create(nome_opcao, descricao, duracao_min, preco);
             res.redirect(`/servicos/${id}`);
         } catch (error) {
             console.error('Erro ao criar serviço:', error);
+            
+            const errorMessage = error.code === 'ER_DUP_ENTRY' 
+                ? 'Já existe um serviço com este nome' 
+                : 'Erro ao criar serviço';
+            
             res.render('servicos/form', { 
                 title: 'Adicionar Serviço',
-                error: 'Erro ao criar serviço',
+                error: errorMessage,
                 servico: req.body 
             });
         }
@@ -99,9 +104,9 @@ const servicoController = {
     // UPDATE - Atualiza serviço
     update: async (req, res) => {
         const { id } = req.params;
-        const { nome, descricao, duracao_min, preco, estado } = req.body;
+        const { nome_opcao, descricao, duracao_min, preco, estado } = req.body;
 
-        if (!nome || !duracao_min || !preco) {
+        if (!nome_opcao || !duracao_min || !preco) {
             const servico = await Servico.findById(id);
             return res.render('servicos/form', { 
                 title: 'Editar Serviço',
@@ -120,15 +125,19 @@ const servicoController = {
         }
 
         try {
-            await Servico.update(id, nome, descricao, duracao_min, preco, estado || 'ativo');
+            await Servico.update(id, nome_opcao, descricao, duracao_min, preco, estado || 'ativo');
             res.redirect(`/servicos/${id}`);
         } catch (error) {
             console.error('Erro ao atualizar serviço:', error);
             
+            const errorMessage = error.code === 'ER_DUP_ENTRY' 
+                ? 'Já existe um serviço com este nome' 
+                : 'Erro ao atualizar serviço';
+            
             const servico = await Servico.findById(id);
             res.render('servicos/form', { 
                 title: 'Editar Serviço',
-                error: 'Erro ao atualizar serviço',
+                error: errorMessage,
                 servico: { ...servico, ...req.body } 
             });
         }

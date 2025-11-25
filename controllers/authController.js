@@ -47,7 +47,7 @@ const authController = {
 
             // Login bem-sucedido
             req.session.userId = user.id;
-            req.session.userName = user.nome; // Agora já vem como "nome completo"
+            req.session.userName = user.nome;
             res.redirect('/');
 
         } catch (error) {
@@ -70,23 +70,13 @@ const authController = {
 
     // POST - Processar registo
     postRegister: async (req, res) => {
-        const { nome, email, password, password_confirm, telefone } = req.body;
+        const { primeiro_nome, ultimo_nome, email, password, password_confirm, telefone } = req.body;
 
         // Validações
-        if (!nome || !email || !password || !password_confirm) {
+        if (!primeiro_nome || !ultimo_nome || !email || !password || !password_confirm || !telefone) {
             return res.render('auth/register', { 
                 title: 'Registar',
                 error: 'Preencha todos os campos obrigatórios',
-                cliente: req.body 
-            });
-        }
-
-        // Valida se o nome tem pelo menos primeiro e último nome
-        const nomes = nome.trim().split(' ');
-        if (nomes.length < 1) {
-            return res.render('auth/register', { 
-                title: 'Registar',
-                error: 'Por favor, insira o seu nome completo',
                 cliente: req.body 
             });
         }
@@ -108,11 +98,11 @@ const authController = {
         }
 
         try {
-            const id = await Cliente.create(nome, email, password, telefone || '');
+            const id = await Cliente.create(primeiro_nome, ultimo_nome, email, password, telefone);
             
             // Login automático após registo
             req.session.userId = id;
-            req.session.userName = nome;
+            req.session.userName = `${primeiro_nome} ${ultimo_nome}`;
             res.redirect('/');
 
         } catch (error) {

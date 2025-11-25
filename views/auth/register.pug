@@ -16,8 +16,12 @@ html(lang='pt')
         
         form(action='/auth/register', method='POST')
           .form-group
-            label(for='nome') Nome Completo
-            input#nome(type='text', name='nome', value=cliente && cliente.nome || '', required)
+            label(for='nome') Primeiro Nome
+            input#nome(type='text', name='nome', value=cliente && cliente.primeiro_nome || '', required)
+
+            .form-group
+            label(for='nome') Ultimo Nome
+            input#nome(type='text', name='nome', value=cliente && cliente.ultimo_nome || '', required)
           
           .form-group
             label(for='email') Email

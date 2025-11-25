@@ -22,17 +22,17 @@ const Barbeiro = {
     },
 
     // CREATE: Cria um novo barbeiro
-    create: async (primeiro_nome, ultimo_nome, email, password, telefone, foto_url) => {
+    create: async (primeiro_nome, ultimo_nome, email, password, telefone, fotografia) => {
         const palavra_passe = await bcrypt.hash(password, 10);
         const sql = 'INSERT INTO barbeiros (primeiro_nome, ultimo_nome, email, palavra_passe, telefone, fotografia) VALUES (?, ?, ?, ?, ?, ?)';
-        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, palavra_passe, telefone || '', foto_url]);
+        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, palavra_passe, telefone, fotografia]);
         return result.insertId;
     },
 
     // READ: Encontra um barbeiro por ID
     findById: async (id) => {
         const [rows] = await db.execute(
-            'SELECT id, primeiro_nome, ultimo_nome, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, email, telefone, fotografia AS foto_url FROM barbeiros WHERE id = ?', 
+            'SELECT id, primeiro_nome, ultimo_nome, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, email, telefone, fotografia FROM barbeiros WHERE id = ?', 
             [id]
         );
         return rows[0];
@@ -47,19 +47,19 @@ const Barbeiro = {
     // READ: Lista todos os barbeiros
     findAll: async () => {
         const [rows] = await db.execute(
-            'SELECT id, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, fotografia AS foto_url FROM barbeiros ORDER BY primeiro_nome'
+            'SELECT id, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, fotografia FROM barbeiros ORDER BY primeiro_nome'
         );
         return rows;
     },
 
     // UPDATE: Atualiza os dados do barbeiro
-    update: async (id, primeiro_nome, ultimo_nome, email, telefone, foto_url) => {
+    update: async (id, primeiro_nome, ultimo_nome, email, telefone, fotografia) => {
         let sql = 'UPDATE barbeiros SET primeiro_nome = ?, ultimo_nome = ?, email = ?, telefone = ?';
-        let params = [primeiro_nome, ultimo_nome, email, telefone || ''];
+        let params = [primeiro_nome, ultimo_nome, email, telefone];
         
-        if (foto_url !== undefined) {
+        if (fotografia !== undefined) {
             sql += ', fotografia = ?';
-            params.push(foto_url);
+            params.push(fotografia);
         }
         
         sql += ' WHERE id = ?';

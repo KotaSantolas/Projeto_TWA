@@ -61,10 +61,10 @@ const reservaController = {
 
     // CREATE - Cria nova reserva
     create: async (req, res) => {
-        const { cliente_id, barbeiro_id, servico_id, data_hora, observacoes } = req.body;
+        const { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
 
         // Validações básicas
-        if (!cliente_id || !barbeiro_id || !servico_id || !data_hora) {
+        if (!cliente_id || !barbeiro_id || !opcao_id || !data_hora) {
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
@@ -81,7 +81,7 @@ const reservaController = {
 
         try {
             // Verifica disponibilidade do barbeiro
-            const servico = await Servico.findById(servico_id);
+            const servico = await Servico.findById(opcao_id);
             const isAvailable = await Reserva.isAvailable(barbeiro_id, data_hora, servico.duracao_min);
             
             if (!isAvailable) {
@@ -99,7 +99,7 @@ const reservaController = {
                 });
             }
 
-            const id = await Reserva.create(cliente_id, barbeiro_id, servico_id, data_hora, observacoes);
+            const id = await Reserva.create(cliente_id, barbeiro_id, opcao_id, data_hora, observacoes);
             res.redirect(`/reservas/${id}`);
             
         } catch (error) {
@@ -150,9 +150,9 @@ const reservaController = {
     // UPDATE - Atualiza reserva
     update: async (req, res) => {
         const { id } = req.params;
-        const { data_hora, barbeiro_id, servico_id, estado, observacoes } = req.body;
+        const { data_hora, barbeiro_id, opcao_id, estado, observacoes } = req.body;
 
-        if (!data_hora || !barbeiro_id || !servico_id || !estado) {
+        if (!data_hora || !barbeiro_id || !opcao_id || !estado) {
             const reserva = await Reserva.findById(id);
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
@@ -170,7 +170,7 @@ const reservaController = {
 
         try {
             // Verifica disponibilidade (excluindo a própria reserva)
-            const servico = await Servico.findById(servico_id);
+            const servico = await Servico.findById(opcao_id);
             const isAvailable = await Reserva.isAvailable(barbeiro_id, data_hora, servico.duracao_min, id);
             
             if (!isAvailable) {
@@ -189,7 +189,7 @@ const reservaController = {
                 });
             }
 
-            await Reserva.update(id, data_hora, barbeiro_id, servico_id, estado, observacoes);
+            await Reserva.update(id, data_hora, barbeiro_id, opcao_id, estado, observacoes);
             res.redirect(`/reservas/${id}`);
             
         } catch (error) {
