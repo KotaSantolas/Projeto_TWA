@@ -1,15 +1,15 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
-// Configuração do pool de conexões
 const pool = mysql.createPool({
-    host:'localhost',
-    user:'root',
-    database:'barbeiro',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-}).promise(); // Usar promises para async/await
+}).promise();
 
 console.log('Pool de conexões MySQL criado.');
 
