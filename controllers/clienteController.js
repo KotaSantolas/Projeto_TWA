@@ -126,7 +126,7 @@ const clienteController = {
         }
     },
 
-    // DELETE - Remove cliente
+    // DELETE - Remove cliente (RESTRICT - impede se tiver reservas)
     delete: async (req, res) => {
         const { id } = req.params;
         try {
@@ -139,6 +139,7 @@ const clienteController = {
         } catch (error) {
             console.error('Erro ao remover cliente:', error);
             
+            // RESTRICT vai gerar este erro se o cliente tiver reservas
             if (error.code === 'ER_ROW_IS_REFERENCED_2') {
                 return res.status(400).json({ 
                     success: false, 

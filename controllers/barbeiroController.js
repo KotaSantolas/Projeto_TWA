@@ -142,7 +142,7 @@ const barbeiroController = {
         }
     },
 
-    // DELETE
+    // DELETE (RESTRICT impedirá se tiver reservas)
     delete: async (req, res) => {
         const { id } = req.params;
         try {

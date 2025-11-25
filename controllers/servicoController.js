@@ -69,11 +69,7 @@ const servicoController = {
             res.redirect(`/servicos/${id}`);
         } catch (error) {
             console.error('Erro ao criar serviço:', error);
-            
-            const errorMessage = error.code === 'ER_DUP_ENTRY' 
-                ? 'Já existe um serviço com este nome' 
-                : 'Erro ao criar serviço';
-            
+            const errorMessage = error.code === 'ER_DUP_ENTRY' ? 'Já existe um serviço com este nome' : 'Erro ao criar serviço';
             res.render('servicos/form', { 
                 title: 'Adicionar Serviço',
                 error: errorMessage,
@@ -130,11 +126,8 @@ const servicoController = {
         } catch (error) {
             console.error('Erro ao atualizar serviço:', error);
             
-            const errorMessage = error.code === 'ER_DUP_ENTRY' 
-                ? 'Já existe um serviço com este nome' 
-                : 'Erro ao atualizar serviço';
-            
             const servico = await Servico.findById(id);
+            const errorMessage = error.code === 'ER_DUP_ENTRY' ? 'Já existe um serviço com este nome' : 'Erro ao atualizar serviço';
             res.render('servicos/form', { 
                 title: 'Editar Serviço',
                 error: errorMessage,
@@ -143,7 +136,7 @@ const servicoController = {
         }
     },
 
-    // DELETE - Remove serviço
+    // DELETE - Remove serviço (RESTRICT impedirá se tiver reservas)
     delete: async (req, res) => {
         const { id } = req.params;
         try {
