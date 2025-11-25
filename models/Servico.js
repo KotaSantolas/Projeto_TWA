@@ -7,13 +7,12 @@ const Servico = {
     createTable: async () => {
         const sql = `
             CREATE TABLE IF NOT EXISTS servicos (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 nome VARCHAR(255) NOT NULL,
                 descricao TEXT,
-                duracao_min INT NOT NULL,
-                preco DECIMAL(10, 2) NOT NULL,
-                estado ENUM('ativo', 'inativo') DEFAULT 'ativo',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                duracao_min SMALLINT UNSIGNED NOT NULL,
+                preco DECIMAL(8, 2) NOT NULL,
+                ativo TINYINT(1) NOT NULL DEFAULT 1
             )
         `;
         await db.execute(sql);
@@ -29,21 +28,27 @@ const Servico = {
 
     // READ: Encontra um serviço por ID
     findById: async (id) => {
-        const [rows] = await db.execute('SELECT * FROM servicos WHERE id = ?', [id]);
+        const [rows] = await db.execute(
+            'SELECT id, nome, descricao, duracao_min, preco, IF(ativo = 1, "ativo", "inativo") AS estado FROM servicos WHERE id = ?', 
+            [id]
+        );
         return rows[0];
     },
 
     // READ: Lista todos os serviços (ou ativos)
     findAll: async (onlyActive = false) => {
-        const condition = onlyActive ? "WHERE estado = 'ativo'" : '';
-        const [rows] = await db.execute(`SELECT * FROM servicos ${condition} ORDER BY nome`);
+        const condition = onlyActive ? 'WHERE ativo = 1' : '';
+        const [rows] = await db.execute(
+            `SELECT id, nome, descricao, duracao_min, preco, IF(ativo = 1, "ativo", "inativo") AS estado FROM servicos ${condition} ORDER BY nome`
+        );
         return rows;
     },
 
     // UPDATE: Atualiza os dados do serviço
     update: async (id, nome, descricao, duracao_min, preco, estado) => {
-        const sql = 'UPDATE servicos SET nome = ?, descricao = ?, duracao_min = ?, preco = ?, estado = ? WHERE id = ?';
-        const [result] = await db.execute(sql, [nome, descricao, duracao_min, preco, estado, id]);
+        const ativo = estado === 'ativo' ? 1 : 0;
+        const sql = 'UPDATE servicos SET nome = ?, descricao = ?, duracao_min = ?, preco = ?, ativo = ? WHERE id = ?';
+        const [result] = await db.execute(sql, [nome, descricao, duracao_min, preco, ativo, id]);
         return result.affectedRows;
     },
 

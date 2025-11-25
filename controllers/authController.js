@@ -47,7 +47,7 @@ const authController = {
 
             // Login bem-sucedido
             req.session.userId = user.id;
-            req.session.userName = user.nome;
+            req.session.userName = user.nome; // Agora já vem como "nome completo"
             res.redirect('/');
 
         } catch (error) {
@@ -81,6 +81,16 @@ const authController = {
             });
         }
 
+        // Valida se o nome tem pelo menos primeiro e último nome
+        const nomes = nome.trim().split(' ');
+        if (nomes.length < 1) {
+            return res.render('auth/register', { 
+                title: 'Registar',
+                error: 'Por favor, insira o seu nome completo',
+                cliente: req.body 
+            });
+        }
+
         if (password !== password_confirm) {
             return res.render('auth/register', { 
                 title: 'Registar',
@@ -98,7 +108,7 @@ const authController = {
         }
 
         try {
-            const id = await Cliente.create(nome, email, password, telefone);
+            const id = await Cliente.create(nome, email, password, telefone || '');
             
             // Login automático após registo
             req.session.userId = id;

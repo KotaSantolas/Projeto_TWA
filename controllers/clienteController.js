@@ -46,9 +46,9 @@ const clienteController = {
 
     // CREATE - Cria novo cliente
     create: async (req, res) => {
-        const { nome, email, password, telefone } = req.body;
+        const { primeiro_nome, ultimo_nome, email, password, telefone } = req.body;
 
-        if (!nome || !email || !password) {
+        if (!primeiro_nome || !ultimo_nome || !email || !password) {
             return res.render('clientes/form', { 
                 title: 'Adicionar Cliente',
                 error: 'Preencha todos os campos obrigatórios',
@@ -57,7 +57,7 @@ const clienteController = {
         }
 
         try {
-            const id = await Cliente.create(nome, email, password, telefone);
+            const id = await Cliente.create(primeiro_nome, ultimo_nome, email, password, telefone || '');
             res.redirect(`/clientes/${id}`);
         } catch (error) {
             console.error('Erro ao criar cliente:', error);
@@ -96,9 +96,9 @@ const clienteController = {
     // UPDATE - Atualiza cliente
     update: async (req, res) => {
         const { id } = req.params;
-        const { nome, email, telefone } = req.body;
+        const { primeiro_nome, ultimo_nome, email, telefone } = req.body;
 
-        if (!nome || !email) {
+        if (!primeiro_nome || !ultimo_nome || !email) {
             const cliente = await Cliente.findById(id);
             return res.render('clientes/form', { 
                 title: 'Editar Cliente',
@@ -108,7 +108,7 @@ const clienteController = {
         }
 
         try {
-            await Cliente.update(id, nome, email, telefone);
+            await Cliente.update(id, primeiro_nome, ultimo_nome, email, telefone || '');
             res.redirect(`/clientes/${id}`);
         } catch (error) {
             console.error('Erro ao atualizar cliente:', error);

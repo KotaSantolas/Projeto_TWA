@@ -8,13 +8,13 @@ const Barbeiro = {
     createTable: async () => {
         const sql = `
             CREATE TABLE IF NOT EXISTS barbeiros (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                nome VARCHAR(255) NOT NULL,
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                primeiro_nome VARCHAR(80) NOT NULL,
+                ultimo_nome VARCHAR(80) NOT NULL,
                 email VARCHAR(255) UNIQUE NOT NULL,
-                password_hash VARCHAR(255) NOT NULL,
-                telefone VARCHAR(20),
-                foto_url VARCHAR(255) DEFAULT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                palavra_passe VARCHAR(255) NOT NULL,
+                telefone VARCHAR(32) NOT NULL,
+                fotografia VARCHAR(255) DEFAULT NULL
             )
         `;
         await db.execute(sql);
@@ -22,16 +22,19 @@ const Barbeiro = {
     },
 
     // CREATE: Cria um novo barbeiro
-    create: async (nome, email, password, telefone, foto_url) => {
-        const password_hash = await bcrypt.hash(password, 10);
-        const sql = 'INSERT INTO barbeiros (nome, email, password_hash, telefone, foto_url) VALUES (?, ?, ?, ?, ?)';
-        const [result] = await db.execute(sql, [nome, email, password_hash, telefone, foto_url]);
+    create: async (primeiro_nome, ultimo_nome, email, password, telefone, foto_url) => {
+        const palavra_passe = await bcrypt.hash(password, 10);
+        const sql = 'INSERT INTO barbeiros (primeiro_nome, ultimo_nome, email, palavra_passe, telefone, fotografia) VALUES (?, ?, ?, ?, ?, ?)';
+        const [result] = await db.execute(sql, [primeiro_nome, ultimo_nome, email, palavra_passe, telefone || '', foto_url]);
         return result.insertId;
     },
 
     // READ: Encontra um barbeiro por ID
     findById: async (id) => {
-        const [rows] = await db.execute('SELECT id, nome, email, telefone, foto_url FROM barbeiros WHERE id = ?', [id]);
+        const [rows] = await db.execute(
+            'SELECT id, primeiro_nome, ultimo_nome, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, email, telefone, fotografia AS foto_url FROM barbeiros WHERE id = ?', 
+            [id]
+        );
         return rows[0];
     },
     
@@ -43,17 +46,19 @@ const Barbeiro = {
 
     // READ: Lista todos os barbeiros
     findAll: async () => {
-        const [rows] = await db.execute('SELECT id, nome, foto_url FROM barbeiros ORDER BY nome');
+        const [rows] = await db.execute(
+            'SELECT id, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, fotografia AS foto_url FROM barbeiros ORDER BY primeiro_nome'
+        );
         return rows;
     },
 
     // UPDATE: Atualiza os dados do barbeiro
-    update: async (id, nome, email, telefone, foto_url) => {
-        let sql = 'UPDATE barbeiros SET nome = ?, email = ?, telefone = ?';
-        let params = [nome, email, telefone];
+    update: async (id, primeiro_nome, ultimo_nome, email, telefone, foto_url) => {
+        let sql = 'UPDATE barbeiros SET primeiro_nome = ?, ultimo_nome = ?, email = ?, telefone = ?';
+        let params = [primeiro_nome, ultimo_nome, email, telefone || ''];
         
         if (foto_url !== undefined) {
-            sql += ', foto_url = ?';
+            sql += ', fotografia = ?';
             params.push(foto_url);
         }
         
