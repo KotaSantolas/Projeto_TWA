@@ -9,11 +9,11 @@ block content
       a.btn.btn-primary(href='/barbeiros') Voltar
   
   .card
-    if barbeiro.foto_url
+    if barbeiro.fotografia
       .detail-item
         span.detail-label Foto
         div
-          img.image-preview(src=barbeiro.foto_url, alt=barbeiro.nome)
+          img.image-preview(src=barbeiro.fotografia, alt=barbeiro.nome)
     
     .detail-item
       span.detail-label ID
@@ -29,4 +29,4 @@ block content
     
     .detail-item
       span.detail-label Telefone
-      span.detail-value= barbeiro.telefone || 'Não informado'
+      span.detail-value= barbeiro.telefone

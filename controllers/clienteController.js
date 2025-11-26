@@ -132,9 +132,9 @@ const clienteController = {
         try {
             const affectedRows = await Cliente.delete(id);
             if (affectedRows > 0) {
-                res.json({ success: true, message: 'Cliente removido com sucesso' });
+                return res.status(200).json({ success: true, message: 'Cliente removido com sucesso' });
             } else {
-                res.status(404).json({ success: false, message: 'Cliente não encontrado' });
+                return res.status(404).json({ success: false, message: 'Cliente não encontrado' });
             }
         } catch (error) {
             console.error('Erro ao remover cliente:', error);
@@ -147,7 +147,7 @@ const clienteController = {
                 });
             }
             
-            res.status(500).json({ success: false, message: 'Erro ao remover cliente' });
+            return res.status(500).json({ success: false, message: 'Erro ao remover cliente' });
         }
     }
 };

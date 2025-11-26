@@ -4,6 +4,6 @@ block content
   .card(style='text-align: center; padding: 3rem;')
     h1(style='font-size: 4rem; color: #e74c3c;') ⚠️
     h2= message
-    if error.status
+    if error && error.status
       p Código: #{error.status}
     a.btn.btn-primary(href='/', style='margin-top: 2rem;') Voltar ao Dashboard

@@ -19,8 +19,8 @@ block content
           each barbeiro in barbeiros
             tr
               td
-                if barbeiro.foto_url
-                  img.image-preview(src=barbeiro.foto_url, alt=barbeiro.nome, style='max-width: 50px;')
+                if barbeiro.fotografia
+                  img.image-preview(src=barbeiro.fotografia, alt=barbeiro.nome, style='max-width: 50px;')
                 else
                   | -
               td= barbeiro.nome

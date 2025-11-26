@@ -8,16 +8,20 @@ block content
   .card
     form(action=barbeiro ? `/barbeiros/${barbeiro.id}` : '/barbeiros', method='POST', enctype='multipart/form-data')
       .form-group
-        label(for='nome') Nome *
-        input#nome(type='text', name='nome', value=barbeiro && barbeiro.nome || '', required)
+        label(for='primeiro_nome') Primeiro Nome *
+        input#primeiro_nome(type='text', name='primeiro_nome', value=barbeiro && barbeiro.primeiro_nome || '', required)
+      
+      .form-group
+        label(for='ultimo_nome') Último Nome *
+        input#ultimo_nome(type='text', name='ultimo_nome', value=barbeiro && barbeiro.ultimo_nome || '', required)
       
       .form-group
         label(for='email') Email *
         input#email(type='email', name='email', value=barbeiro && barbeiro.email || '', required)
       
       .form-group
-        label(for='telefone') Telefone
-        input#telefone(type='tel', name='telefone', value=barbeiro && barbeiro.telefone || '')
+        label(for='telefone') Telefone *
+        input#telefone(type='tel', name='telefone', value=barbeiro && barbeiro.telefone || '', required)
       
       if !barbeiro
         .form-group
@@ -28,9 +32,9 @@ block content
       .form-group
         label(for='foto') Foto
         input#foto(type='file', name='foto', accept='image/*')
-        if barbeiro && barbeiro.foto_url
+        if barbeiro && barbeiro.fotografia
           div(style='margin-top: 1rem;')
-            img.image-preview(src=barbeiro.foto_url, alt='Foto atual')
+            img.image-preview(src=barbeiro.fotografia, alt='Foto atual')
             div
               input(type='checkbox', name='remover_foto', id='remover_foto')
               label(for='remover_foto', style='display: inline; margin-left: 0.5rem;') Remover foto

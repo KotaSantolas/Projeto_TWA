@@ -8,16 +8,20 @@ block content
   .card
     form(action=cliente ? `/clientes/${cliente.id}` : '/clientes', method='POST')
       .form-group
-        label(for='nome') Nome *
-        input#nome(type='text', name='nome', value=cliente && cliente.nome || '', required)
+        label(for='primeiro_nome') Primeiro Nome *
+        input#primeiro_nome(type='text', name='primeiro_nome', value=cliente && cliente.primeiro_nome || '', required)
+      
+      .form-group
+        label(for='ultimo_nome') Último Nome *
+        input#ultimo_nome(type='text', name='ultimo_nome', value=cliente && cliente.ultimo_nome || '', required)
       
       .form-group
         label(for='email') Email *
         input#email(type='email', name='email', value=cliente && cliente.email || '', required)
       
       .form-group
-        label(for='telefone') Telefone
-        input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '')
+        label(for='telefone') Telefone *
+        input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '', required)
       
       if !cliente
         .form-group

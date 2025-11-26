@@ -21,7 +21,7 @@ block content
             tr
               td= cliente.nome
               td= cliente.email
-              td= cliente.telefone || '-'
+              td= cliente.telefone
               td.actions
                 a.btn.btn-primary(href=`/clientes/${cliente.id}`) Ver
                 a.btn.btn-secondary(href=`/clientes/${cliente.id}/edit`) Editar
