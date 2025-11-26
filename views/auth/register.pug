@@ -16,28 +16,28 @@ html(lang='pt')
         
         form(action='/auth/register', method='POST')
           .form-group
-            label(for='nome') Primeiro Nome
-            input#nome(type='text', name='nome', value=cliente && cliente.primeiro_nome || '', required)
-
-            .form-group
-            label(for='nome') Ultimo Nome
-            input#nome(type='text', name='nome', value=cliente && cliente.ultimo_nome || '', required)
+            label(for='primeiro_nome') Primeiro Nome *
+            input#primeiro_nome(type='text', name='primeiro_nome', value=cliente && cliente.primeiro_nome || '', required)
           
           .form-group
-            label(for='email') Email
+            label(for='ultimo_nome') Último Nome *
+            input#ultimo_nome(type='text', name='ultimo_nome', value=cliente && cliente.ultimo_nome || '', required)
+          
+          .form-group
+            label(for='email') Email *
             input#email(type='email', name='email', value=cliente && cliente.email || '', required)
           
           .form-group
-            label(for='telefone') Telefone
-            input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '')
+            label(for='telefone') Telefone *
+            input#telefone(type='tel', name='telefone', value=cliente && cliente.telefone || '', required)
           
           .form-group
-            label(for='password') Password
+            label(for='password') Password *
             input#password(type='password', name='password', required, minlength='6')
             small Mínimo 6 caracteres
           
           .form-group
-            label(for='password_confirm') Confirmar Password
+            label(for='password_confirm') Confirmar Password *
             input#password_confirm(type='password', name='password_confirm', required)
           
           button.btn.btn-primary(type='submit') Registar
