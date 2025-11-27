@@ -17,7 +17,7 @@ const Reserva = {
                 criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 
-                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE RESTRICT,
                 FOREIGN KEY (barbeiro_id) REFERENCES barbeiros(id) ON DELETE RESTRICT,
                 FOREIGN KEY (opcao_id) REFERENCES servicos(id) ON DELETE RESTRICT
             )
