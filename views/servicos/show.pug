@@ -2,7 +2,7 @@ extends ../layout
 
 block content
   .page-header
-    h1= servico.nome
+    h1= servico.nome_opcao
     .actions
       a.btn.btn-secondary(href=`/servicos/${servico.id}/edit`) Editar
       button.btn.btn-danger(onclick=`deleteItem('/servicos/${servico.id}', 'Remover este serviço?')`) Remover
@@ -15,7 +15,7 @@ block content
     
     .detail-item
       span.detail-label Nome
-      span.detail-value= servico.nome
+      span.detail-value= servico.nome_opcao
     
     .detail-item
       span.detail-label Descrição

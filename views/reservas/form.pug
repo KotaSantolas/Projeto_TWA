@@ -23,11 +23,11 @@ block content
             option(value=barbeiro.id, selected=reserva && reserva.barbeiro_id == barbeiro.id)= barbeiro.nome
       
       .form-group
-        label(for='servico_id') Serviço *
-        select#servico_id(name='servico_id', required)
+        label(for='opcao_id') Serviço *
+        select#opcao_id(name='opcao_id', required)
           option(value='') Selecione um serviço
           each servico in servicos
-            option(value=servico.id, selected=reserva && reserva.servico_id == servico.id)= servico.nome + ' - ' + servico.duracao_min + 'min - €' + servico.preco
+            option(value=servico.id, selected=reserva && reserva.opcao_id == servico.id)= servico.nome_opcao + ' - ' + servico.duracao_min + 'min - €' + servico.preco
       
       .form-group
         label(for='data_hora') Data e Hora *

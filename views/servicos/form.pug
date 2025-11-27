@@ -8,8 +8,8 @@ block content
   .card
     form(action=servico ? `/servicos/${servico.id}` : '/servicos', method='POST')
       .form-group
-        label(for='nome') Nome *
-        input#nome(type='text', name='nome', value=servico && servico.nome || '', required)
+        label(for='nome_opcao') Nome *
+        input#nome_opcao(type='text', name='nome_opcao', value=servico && servico.nome_opcao || '', required)
       
       .form-group
         label(for='descricao') Descrição

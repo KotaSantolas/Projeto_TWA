@@ -20,7 +20,7 @@ block content
         tbody
           each servico in servicos
             tr
-              td= servico.nome
+              td= servico.nome_opcao
               td= servico.duracao_min
               td= servico.preco
               td= servico.estado === 'ativo' ? '✅ Ativo' : '❌ Inativo'
