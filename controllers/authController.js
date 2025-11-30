@@ -1,6 +1,7 @@
 // ./controllers/authController.js
 
 const Cliente = require('../models/Cliente');
+const Barbeiro = require('../models/Barbeiro');
 const bcrypt = require('bcrypt');
 
 const authController = {
@@ -12,9 +13,18 @@ const authController = {
         });
     },
 
-    // POST - Processar login
+    // POST - Processar login (CLIENTE OU BARBEIRO)
     postLogin: async (req, res) => {
-        const { email, password } = req.body;
+        const { email, password, userType } = req.body;
+
+        // Validação do tipo de utilizador
+        if (!userType || (userType !== 'cliente' && userType !== 'barbeiro')) {
+            return res.render('auth/login', { 
+                title: 'Login',
+                error: 'Selecione o tipo de utilizador',
+                email 
+            });
+        }
 
         if (!email || !password) {
             return res.render('auth/login', { 
@@ -25,7 +35,14 @@ const authController = {
         }
 
         try {
-            const user = await Cliente.findByEmail(email);
+            let user;
+            
+            // Buscar na tabela correta conforme o tipo
+            if (userType === 'cliente') {
+                user = await Cliente.findByEmail(email);
+            } else {
+                user = await Barbeiro.findByEmail(email);
+            }
             
             if (!user) {
                 return res.render('auth/login', { 
@@ -45,9 +62,11 @@ const authController = {
                 });
             }
 
-            // Login bem-sucedido
+            // Login bem-sucedido - guardar tipo na sessão
             req.session.userId = user.id;
             req.session.userName = user.nome;
+            req.session.userType = userType;
+            
             res.redirect('/');
 
         } catch (error) {
@@ -60,7 +79,7 @@ const authController = {
         }
     },
 
-    // GET - Formulário de registo
+    // GET - Formulário de registo (APENAS CLIENTES)
     getRegister: (req, res) => {
         res.render('auth/register', { 
             title: 'Registar',
@@ -68,7 +87,7 @@ const authController = {
         });
     },
 
-    // POST - Processar registo
+    // POST - Processar registo (APENAS CLIENTES)
     postRegister: async (req, res) => {
         const { primeiro_nome, ultimo_nome, email, password, password_confirm, telefone } = req.body;
 
@@ -100,9 +119,11 @@ const authController = {
         try {
             const id = await Cliente.create(primeiro_nome, ultimo_nome, email, password, telefone);
             
-            // Login automático após registo
+            // Login automático após registo (SEMPRE como cliente)
             req.session.userId = id;
             req.session.userName = `${primeiro_nome} ${ultimo_nome}`;
+            req.session.userType = 'cliente';
+            
             res.redirect('/');
 
         } catch (error) {

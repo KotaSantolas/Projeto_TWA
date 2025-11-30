@@ -3,29 +3,29 @@
 const express = require('express');
 const router = express.Router();
 const clienteController = require('../controllers/clienteController');
-const { requireAuth } = require('../middleware/auth');
+const { requireBarbeiro } = require('../middleware/auth');
 
-// Todas as rotas de clientes requerem autenticação
+// TODAS as rotas de clientes requerem ser BARBEIRO
 
 // GET /clientes - Lista todos os clientes
-router.get('/', requireAuth, clienteController.index);
+router.get('/', requireBarbeiro, clienteController.index);
 
 // GET /clientes/create - Formulário para criar
-router.get('/create', requireAuth, clienteController.getCreateForm);
+router.get('/create', requireBarbeiro, clienteController.getCreateForm);
 
 // POST /clientes - Criar novo cliente
-router.post('/', requireAuth, clienteController.create);
+router.post('/', requireBarbeiro, clienteController.create);
 
 // GET /clientes/:id/edit - Formulário para editar
-router.get('/:id/edit', requireAuth, clienteController.getEditForm);
+router.get('/:id/edit', requireBarbeiro, clienteController.getEditForm);
 
 // POST /clientes/:id - Atualizar cliente
-router.post('/:id', requireAuth, clienteController.update);
+router.post('/:id', requireBarbeiro, clienteController.update);
 
 // DELETE /clientes/:id - Remover cliente
-router.delete('/:id', requireAuth, clienteController.delete);
+router.delete('/:id', requireBarbeiro, clienteController.delete);
 
 // GET /clientes/:id - Detalhes do cliente
-router.get('/:id', requireAuth, clienteController.show);
+router.get('/:id', requireBarbeiro, clienteController.show);
 
 module.exports = router;

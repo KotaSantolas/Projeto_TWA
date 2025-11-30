@@ -38,9 +38,12 @@ const Barbeiro = {
         return rows[0];
     },
     
-    // READ: Encontra um barbeiro por Email (para login)
+    // READ: Encontra um barbeiro por Email (para login) - RETORNA password_hash
     findByEmail: async (email) => {
-        const [rows] = await db.execute('SELECT * FROM barbeiros WHERE email = ?', [email]);
+        const [rows] = await db.execute(
+            'SELECT id, CONCAT(primeiro_nome, " ", ultimo_nome) AS nome, palavra_passe AS password_hash, email FROM barbeiros WHERE email = ?', 
+            [email]
+        );
         return rows[0];
     },
 

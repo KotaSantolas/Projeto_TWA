@@ -6,10 +6,19 @@ const Barbeiro = require('../models/Barbeiro');
 const Servico = require('../models/Servico');
 
 const reservaController = {
-    // READ All - Lista todas as reservas
+    // READ All - Lista todas as reservas (com filtro para clientes)
     index: async (req, res) => {
         try {
-            const reservas = await Reserva.findAll();
+            let reservas;
+            
+            // Se for CLIENTE, mostrar apenas suas próprias reservas
+            if (req.session.userType === 'cliente') {
+                reservas = await Reserva.findAll({ cliente_id: req.session.userId });
+            } else {
+                // Se for BARBEIRO, mostrar todas as reservas
+                reservas = await Reserva.findAll();
+            }
+            
             res.render('reservas/index', { 
                 title: 'Reservas',
                 reservas 
@@ -28,6 +37,15 @@ const reservaController = {
             if (!reserva) {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
+            
+            // Se for CLIENTE, verificar se a reserva é dele
+            if (req.session.userType === 'cliente' && reserva.cliente_id !== req.session.userId) {
+                return res.status(403).render('error', { 
+                    message: 'Não tem permissão para ver esta reserva',
+                    error: { status: 403 }
+                });
+            }
+            
             res.render('reservas/show', { 
                 title: `Reserva #${reserva.id}`,
                 reserva 
@@ -45,12 +63,16 @@ const reservaController = {
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true); // Apenas ativos
             
+            // Se for CLIENTE, pré-selecionar o próprio cliente_id
+            const preSelectedCliente = req.session.userType === 'cliente' ? req.session.userId : null;
+            
             res.render('reservas/form', { 
                 title: 'Nova Reserva',
                 reserva: null,
                 clientes,
                 barbeiros,
                 servicos,
+                preSelectedCliente,
                 error: null 
             });
         } catch (error) {
@@ -61,13 +83,19 @@ const reservaController = {
 
     // CREATE - Cria nova reserva
     create: async (req, res) => {
-        const { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
+        let { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
+
+        // Se for CLIENTE, forçar cliente_id = userId da sessão
+        if (req.session.userType === 'cliente') {
+            cliente_id = req.session.userId;
+        }
 
         // Validações básicas
         if (!cliente_id || !barbeiro_id || !opcao_id || !data_hora) {
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
+            const preSelectedCliente = req.session.userType === 'cliente' ? req.session.userId : null;
             
             return res.render('reservas/form', { 
                 title: 'Nova Reserva',
@@ -75,7 +103,8 @@ const reservaController = {
                 reserva: req.body,
                 clientes,
                 barbeiros,
-                servicos 
+                servicos,
+                preSelectedCliente 
             });
         }
 
@@ -88,6 +117,7 @@ const reservaController = {
                 const clientes = await Cliente.findAll();
                 const barbeiros = await Barbeiro.findAll();
                 const servicos = await Servico.findAll(true);
+                const preSelectedCliente = req.session.userType === 'cliente' ? req.session.userId : null;
                 
                 return res.render('reservas/form', { 
                     title: 'Nova Reserva',
@@ -95,7 +125,8 @@ const reservaController = {
                     reserva: req.body,
                     clientes,
                     barbeiros,
-                    servicos 
+                    servicos,
+                    preSelectedCliente 
                 });
             }
 
@@ -108,6 +139,7 @@ const reservaController = {
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
+            const preSelectedCliente = req.session.userType === 'cliente' ? req.session.userId : null;
             
             res.render('reservas/form', { 
                 title: 'Nova Reserva',
@@ -115,7 +147,8 @@ const reservaController = {
                 reserva: req.body,
                 clientes,
                 barbeiros,
-                servicos 
+                servicos,
+                preSelectedCliente 
             });
         }
     },
@@ -129,6 +162,14 @@ const reservaController = {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
             
+            // Se for CLIENTE, verificar se a reserva é dele
+            if (req.session.userType === 'cliente' && reserva.cliente_id !== req.session.userId) {
+                return res.status(403).render('error', { 
+                    message: 'Não tem permissão para editar esta reserva',
+                    error: { status: 403 }
+                });
+            }
+            
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
@@ -139,6 +180,7 @@ const reservaController = {
                 clientes,
                 barbeiros,
                 servicos,
+                preSelectedCliente: null,
                 error: null 
             });
         } catch (error) {
@@ -152,29 +194,41 @@ const reservaController = {
         const { id } = req.params;
         const { data_hora, barbeiro_id, opcao_id, estado, observacoes } = req.body;
 
-        if (!data_hora || !barbeiro_id || !opcao_id || !estado) {
-            const reserva = await Reserva.findById(id);
-            const clientes = await Cliente.findAll();
-            const barbeiros = await Barbeiro.findAll();
-            const servicos = await Servico.findAll(true);
-            
-            return res.render('reservas/form', { 
-                title: 'Editar Reserva',
-                error: 'Preencha todos os campos obrigatórios',
-                reserva: { ...reserva, ...req.body },
-                clientes,
-                barbeiros,
-                servicos 
-            });
-        }
-
         try {
+            const reserva = await Reserva.findById(id);
+            if (!reserva) {
+                return res.status(404).render('error', { message: 'Reserva não encontrada' });
+            }
+            
+            // Se for CLIENTE, verificar se a reserva é dele
+            if (req.session.userType === 'cliente' && reserva.cliente_id !== req.session.userId) {
+                return res.status(403).render('error', { 
+                    message: 'Não tem permissão para editar esta reserva',
+                    error: { status: 403 }
+                });
+            }
+
+            if (!data_hora || !barbeiro_id || !opcao_id || !estado) {
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'Preencha todos os campos obrigatórios',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos,
+                    preSelectedCliente: null 
+                });
+            }
+
             // Verifica disponibilidade (excluindo a própria reserva)
             const servico = await Servico.findById(opcao_id);
             const isAvailable = await Reserva.isAvailable(barbeiro_id, data_hora, servico.duracao_min, id);
             
             if (!isAvailable) {
-                const reserva = await Reserva.findById(id);
                 const clientes = await Cliente.findAll();
                 const barbeiros = await Barbeiro.findAll();
                 const servicos = await Servico.findAll(true);
@@ -185,7 +239,8 @@ const reservaController = {
                     reserva: { ...reserva, ...req.body },
                     clientes,
                     barbeiros,
-                    servicos 
+                    servicos,
+                    preSelectedCliente: null 
                 });
             }
 
@@ -206,7 +261,8 @@ const reservaController = {
                 reserva: { ...reserva, ...req.body },
                 clientes,
                 barbeiros,
-                servicos 
+                servicos,
+                preSelectedCliente: null 
             });
         }
     },
@@ -215,6 +271,19 @@ const reservaController = {
     delete: async (req, res) => {
         const { id } = req.params;
         try {
+            const reserva = await Reserva.findById(id);
+            if (!reserva) {
+                return res.status(404).json({ success: false, message: 'Reserva não encontrada' });
+            }
+            
+            // Se for CLIENTE, verificar se a reserva é dele
+            if (req.session.userType === 'cliente' && reserva.cliente_id !== req.session.userId) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Não tem permissão para remover esta reserva' 
+                });
+            }
+            
             const affectedRows = await Reserva.delete(id);
             if (affectedRows > 0) {
                 res.json({ success: true, message: 'Reserva removida com sucesso' });

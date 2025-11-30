@@ -9,13 +9,23 @@ html(lang='pt')
     if currentUser
       nav.navbar
         .container
-          h1.logo Barbearia
+          h1.logo Barbearia 
+            if userType === 'barbeiro'
+              span(style='font-size: 0.7rem; color: #3498db; margin-left: 0.5rem;') ✂️ Barbeiro
+            else if userType === 'cliente'
+              span(style='font-size: 0.7rem; color: #2ecc71; margin-left: 0.5rem;') 👤 Cliente
           ul.nav-links
             li: a(href='/') Dashboard
-            li: a(href='/clientes') Clientes
-            li: a(href='/barbeiros') Barbeiros
-            li: a(href='/servicos') Serviços
+            
+            //- APENAS BARBEIROS veem estas opções
+            if userType === 'barbeiro'
+              li: a(href='/clientes') Clientes
+              li: a(href='/barbeiros') Barbeiros
+              li: a(href='/servicos') Serviços
+            
+            //- AMBOS veem Reservas
             li: a(href='/reservas') Reservas
+            
             li: a(href='/auth/logout') Sair
     
     main.container

@@ -7,13 +7,25 @@ block content
   
   .card
     form(action=reserva ? `/reservas/${reserva.id}` : '/reservas', method='POST')
-      if !reserva
+      //- Campo de cliente: escondido e pré-selecionado para clientes, dropdown para barbeiros
+      if userType === 'cliente' && !reserva
+        //- Cliente só pode criar reservas para si próprio
+        input(type='hidden', name='cliente_id', value=preSelectedCliente)
+        .form-group
+          label Cliente
+          input(type='text', value=currentUser.nome, disabled, style='background: #f5f5f5;')
+          small Está a criar uma reserva para si próprio
+      else
+        //- Barbeiros veem o dropdown normal (ou ao editar)
         .form-group
           label(for='cliente_id') Cliente *
-          select#cliente_id(name='cliente_id', required)
-            option(value='') Selecione um cliente
-            each cliente in clientes
-              option(value=cliente.id)= cliente.nome
+          select#cliente_id(name='cliente_id', required, disabled=reserva ? true : false)
+            if reserva
+              option(value=reserva.cliente_id, selected) #{reserva.cliente_nome}
+            else
+              option(value='') Selecione um cliente
+              each cliente in clientes
+                option(value=cliente.id)= cliente.nome
       
       .form-group
         label(for='barbeiro_id') Barbeiro *

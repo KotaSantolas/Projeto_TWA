@@ -5,6 +5,39 @@ html(lang='pt')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     title Login - Barbearia
     link(rel='stylesheet', href='/css/style.css')
+    style.
+      .user-type-choice {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .user-type-choice .btn {
+        flex: 1;
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .user-type-choice .btn span {
+        font-size: 2rem;
+      }
+      #loginForm {
+        display: none;
+      }
+      #loginForm.active {
+        display: block;
+      }
+      .back-button {
+        text-align: center;
+        margin-top: 1rem;
+      }
+      .back-button a {
+        color: #7f8c8d;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
   body.auth-page
     .auth-container
       .auth-box
@@ -14,17 +47,54 @@ html(lang='pt')
         if error
           .alert.alert-error= error
         
-        form(action='/auth/login', method='POST')
+        //- Escolha do tipo de utilizador
+        #userTypeChoice.user-type-choice
+          button.btn.btn-primary(type='button', onclick="selectUserType('cliente')")
+            span 👤
+            | Login como Cliente
+          button.btn.btn-secondary(type='button', onclick="selectUserType('barbeiro')")
+            span ✂️
+            | Login como Barbeiro
+        
+        //- Formulário de login (escondido inicialmente)
+        form#loginForm(action='/auth/login', method='POST')
+          input#userType(type='hidden', name='userType', value='')
+          
           .form-group
             label(for='email') Email
-            input#email(type='email', name='email', value=email || '', required)
+            input#email(type='email', name='email', required)
           
           .form-group
             label(for='password') Password
             input#password(type='password', name='password', required)
           
           button.btn.btn-primary(type='submit') Entrar
+          
+          .back-button
+            a(href='#', onclick='showUserTypeChoice(); return false;') ← Voltar à escolha
         
         p.auth-link
           | Não tens conta? 
-          a(href='/auth/register') Registar
+          a(href='/auth/register') Registar como Cliente
+
+    script.
+      function selectUserType(type) {
+        document.getElementById('userType').value = type;
+        document.getElementById('userTypeChoice').style.display = 'none';
+        document.getElementById('loginForm').classList.add('active');
+        
+        // Atualizar título conforme o tipo
+        const subtitle = document.querySelector('.subtitle');
+        if (type === 'cliente') {
+          subtitle.textContent = 'Login como Cliente';
+        } else {
+          subtitle.textContent = 'Login como Barbeiro';
+        }
+      }
+      
+      function showUserTypeChoice() {
+        document.getElementById('userTypeChoice').style.display = 'flex';
+        document.getElementById('loginForm').classList.remove('active');
+        document.querySelector('.subtitle').textContent = 'Gestão de Barbearia';
+        document.getElementById('loginForm').reset();
+      }

@@ -3,29 +3,29 @@
 const express = require('express');
 const router = express.Router();
 const servicoController = require('../controllers/servicoController');
-const { requireAuth } = require('../middleware/auth');
+const { requireBarbeiro } = require('../middleware/auth');
 
-// Todas as rotas de serviços requerem autenticação
+// TODAS as rotas de serviços requerem ser BARBEIRO
 
 // GET /servicos - Lista todos os serviços
-router.get('/', requireAuth, servicoController.index);
+router.get('/', requireBarbeiro, servicoController.index);
 
 // GET /servicos/create - Formulário para criar
-router.get('/create', requireAuth, servicoController.getCreateForm);
+router.get('/create', requireBarbeiro, servicoController.getCreateForm);
 
 // POST /servicos - Criar novo serviço
-router.post('/', requireAuth, servicoController.create);
+router.post('/', requireBarbeiro, servicoController.create);
 
 // GET /servicos/:id/edit - Formulário para editar
-router.get('/:id/edit', requireAuth, servicoController.getEditForm);
+router.get('/:id/edit', requireBarbeiro, servicoController.getEditForm);
 
 // POST /servicos/:id - Atualizar serviço
-router.post('/:id', requireAuth, servicoController.update);
+router.post('/:id', requireBarbeiro, servicoController.update);
 
 // DELETE /servicos/:id - Remover serviço
-router.delete('/:id', requireAuth, servicoController.delete);
+router.delete('/:id', requireBarbeiro, servicoController.delete);
 
 // GET /servicos/:id - Detalhes do serviço
-router.get('/:id', requireAuth, servicoController.show);
+router.get('/:id', requireBarbeiro, servicoController.show);
 
 module.exports = router;
