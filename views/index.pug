@@ -6,22 +6,31 @@ block content
     p Bem-vindo, #{currentUser.nome}!
   
   .dashboard-grid
-    .dashboard-card
-      h2 👥
-      p Clientes
-      a(href='/clientes') Ver todos
+    //- CLIENTES veem apenas Reservas
+    if userType === 'cliente'
+      .dashboard-card
+        h2 📅
+        p As Minhas Reservas
+        a(href='/reservas') Ver todas
     
-    .dashboard-card
-      h2 ✂️
-      p Barbeiros
-      a(href='/barbeiros') Ver todos
-    
-    .dashboard-card
-      h2 💈
-      p Serviços
-      a(href='/servicos') Ver todos
-    
-    .dashboard-card
-      h2 📅
-      p Reservas
-      a(href='/reservas') Ver todas
+    //- BARBEIROS veem tudo
+    else if userType === 'barbeiro'
+      .dashboard-card
+        h2 👥
+        p Clientes
+        a(href='/clientes') Ver todos
+      
+      .dashboard-card
+        h2 ✂️
+        p Barbeiros
+        a(href='/barbeiros') Ver todos
+      
+      .dashboard-card
+        h2 💈
+        p Serviços
+        a(href='/servicos') Ver todos
+      
+      .dashboard-card
+        h2 📅
+        p Reservas
+        a(href='/reservas') Ver todas
