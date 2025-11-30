@@ -1,0 +1,170 @@
+/* ./public/css/calendario.css */
+
+/* Estilo do container do calendário */
+.calendario-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Estilo dos passos do formulário */
+.passo {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.passo.ativo {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.passo-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.passo-numero {
+    width: 40px;
+    height: 40px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+.passo-titulo {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Estilo da lista de horários */
+.horarios-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.horario-item {
+    padding: 12px;
+    background: white;
+    border: 2px solid #007bff;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.horario-item:hover {
+    background: #007bff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.horario-item.selecionado {
+    background: #007bff;
+    color: white;
+}
+
+/* Mensagens */
+.mensagem-info {
+    padding: 15px;
+    background: #e7f3ff;
+    border-left: 4px solid #007bff;
+    border-radius: 4px;
+    margin: 15px 0;
+    color: #004085;
+}
+
+.mensagem-aviso {
+    padding: 15px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    margin: 15px 0;
+    color: #856404;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.loading::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* Botões de navegação */
+.passo-botoes {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-voltar {
+    background: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-voltar:hover {
+    background: #5a6268;
+}
+
+/* Resumo da reserva */
+.resumo-reserva {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.resumo-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.resumo-item:last-child {
+    border-bottom: none;
+}
+
+.resumo-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.resumo-valor {
+    color: #333;
+}

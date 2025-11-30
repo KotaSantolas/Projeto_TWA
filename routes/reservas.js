@@ -10,6 +10,9 @@ const { requireAuth } = require('../middleware/auth');
 // GET /reservas - Lista todas as reservas
 router.get('/', requireAuth, reservaController.index);
 
+// GET /reservas/horarios-disponiveis - Lista horários disponíveis
+router.get('/horarios-disponiveis', requireAuth, reservaController.getHorariosDisponiveis);
+
 // GET /reservas/create - Formulário para criar
 router.get('/create', requireAuth, reservaController.getCreateForm);
 

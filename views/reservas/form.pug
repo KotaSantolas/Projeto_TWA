@@ -1,62 +1,139 @@
 extends ../layout
 
 block content
+  //- CSS e JS do Flatpickr via CDN
+  link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css')
+  link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css')
+  link(rel='stylesheet', href='/css/calendario.css')
+
   .page-header
     h1= reserva ? 'Editar Reserva' : 'Nova Reserva'
     a.btn.btn-primary(href='/reservas') Voltar
   
+  if error
+    .alert.alert-danger= error
+
   .card
-    form(action=reserva ? `/reservas/${reserva.id}` : '/reservas', method='POST')
-      //- Campo de cliente: escondido e pré-selecionado para clientes, dropdown para barbeiros
-      if userType === 'cliente' && !reserva
-        //- Cliente só pode criar reservas para si próprio
-        input(type='hidden', name='cliente_id', value=preSelectedCliente)
+    if reserva
+      //- MODO EDIÇÃO: Formulário tradicional
+      form(action=`/reservas/${reserva.id}`, method='POST')
+        p 
+          strong Cliente: 
+          | #{reserva.cliente_nome}
+        
         .form-group
-          label Cliente
-          input(type='text', value=currentUser.nome, disabled, style='background: #f5f5f5;')
-          small Está a criar uma reserva para si próprio
-      else
-        //- Barbeiros veem o dropdown normal (ou ao editar)
+          label(for='barbeiro_id') Barbeiro *
+          select#barbeiro_id(name='barbeiro_id', required)
+            option(value='') Selecione um barbeiro
+            each barbeiro in barbeiros
+              option(value=barbeiro.id, selected=reserva.barbeiro_id == barbeiro.id)= barbeiro.nome
+        
         .form-group
-          label(for='cliente_id') Cliente *
-          select#cliente_id(name='cliente_id', required, disabled=reserva ? true : false)
-            if reserva
-              option(value=reserva.cliente_id, selected) #{reserva.cliente_nome}
-            else
-              option(value='') Selecione um cliente
-              each cliente in clientes
-                option(value=cliente.id)= cliente.nome
-      
-      .form-group
-        label(for='barbeiro_id') Barbeiro *
-        select#barbeiro_id(name='barbeiro_id', required)
-          option(value='') Selecione um barbeiro
-          each barbeiro in barbeiros
-            option(value=barbeiro.id, selected=reserva && reserva.barbeiro_id == barbeiro.id)= barbeiro.nome
-      
-      .form-group
-        label(for='opcao_id') Serviço *
-        select#opcao_id(name='opcao_id', required)
-          option(value='') Selecione um serviço
-          each servico in servicos
-            option(value=servico.id, selected=reserva && reserva.opcao_id == servico.id)= servico.nome_opcao + ' - ' + servico.duracao_min + 'min - €' + servico.preco
-      
-      .form-group
-        label(for='data_hora') Data e Hora *
-        input#data_hora(type='datetime-local', name='data_hora', value=reserva && reserva.data_hora || '', required)
-      
-      if reserva
+          label(for='opcao_id') Serviço *
+          select#opcao_id(name='opcao_id', required)
+            option(value='') Selecione um serviço
+            each servico in servicos
+              option(value=servico.id, selected=reserva.opcao_id == servico.id)= `${servico.nome_opcao} - ${servico.duracao_min}min - €${servico.preco}`
+        
         .form-group
-          label(for='estado') Estado
-          select#estado(name='estado')
+          label(for='data_hora') Data e Hora *
+          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora, required)
+        
+        .form-group
+          label(for='estado') Estado *
+          select#estado(name='estado', required)
             option(value='pendente', selected=reserva.estado === 'pendente') Pendente
             option(value='confirmada', selected=reserva.estado === 'confirmada') Confirmada
             option(value='concluída', selected=reserva.estado === 'concluída') Concluída
             option(value='cancelada', selected=reserva.estado === 'cancelada') Cancelada
             option(value='não_compareceu', selected=reserva.estado === 'não_compareceu') Não Compareceu
-      
-      .form-group
-        label(for='observacoes') Observações
-        textarea#observacoes(name='observacoes', rows='3')= reserva && reserva.observacoes || ''
-      
-      button.btn.btn-success(type='submit')= reserva ? 'Atualizar' : 'Criar'
+        
+        .form-group
+          label(for='observacoes') Observações
+          textarea#observacoes(name='observacoes', rows='3')= reserva.observacoes || ''
+        
+        button.btn.btn-success(type='submit') Atualizar
+
+    else
+      //- MODO CRIAÇÃO: Sistema de calendário em 3 passos
+      form(action='/reservas', method='POST')
+        
+        //- Hidden inputs para armazenar dados
+        input#data_selecionada(type='hidden', name='data_selecionada')
+        input#horario_selecionado(type='hidden', name='horario_selecionado')
+        input#data_hora(type='hidden', name='data_hora', required)
+
+        //- PASSO 1: Selecionar Cliente, Barbeiro e Serviço
+        #passo1.passo.ativo
+          .passo-header
+            .passo-numero 1
+            .passo-titulo Escolha o Cliente, Barbeiro e Serviço
+          
+          .form-group
+            label(for='cliente_id') Cliente *
+            select#cliente_id(name='cliente_id', required)
+              option(value='') Selecione um cliente
+              each cliente in clientes
+                option(value=cliente.id)= cliente.nome
+          
+          .form-group
+            label(for='barbeiro_id') Barbeiro *
+            select#barbeiro_id(name='barbeiro_id', required)
+              option(value='') Selecione um barbeiro
+              each barbeiro in barbeiros
+                option(value=barbeiro.id)= barbeiro.nome
+          
+          .form-group
+            label(for='opcao_id') Serviço *
+            select#opcao_id(name='opcao_id', required)
+              option(value='') Selecione um serviço
+              each servico in servicos
+                option(value=servico.id)= `${servico.nome_opcao} - ${servico.duracao_min}min - €${servico.preco}`
+          
+          .mensagem-info
+            | ℹ️ Após selecionar o barbeiro e o serviço, poderá escolher a data e o horário.
+
+        //- PASSO 2: Selecionar Data no Calendário
+        #passo2.passo
+          .passo-header
+            .passo-numero 2
+            .passo-titulo Escolha a Data
+          
+          .calendario-container
+            #calendario
+          
+          .passo-botoes
+            button#btn-voltar-2.btn-voltar(type='button') ← Voltar
+
+        //- PASSO 3: Selecionar Horário
+        #passo3.passo
+          .passo-header
+            .passo-numero 3
+            .passo-titulo Escolha o Horário
+          
+          .mensagem-info
+            | 📅 Horários disponíveis para a data selecionada:
+          
+          #horarios-lista.horarios-lista
+            .loading A carregar...
+
+          .passo-botoes
+            button#btn-voltar-3.btn-voltar(type='button') ← Voltar ao Calendário
+
+        //- RESUMO E CONFIRMAÇÃO
+        #resumo-final
+          .resumo-reserva
+            h3 📋 Resumo da Reserva
+            #resumo-info
+              p.mensagem-info Selecione todos os passos acima para ver o resumo.
+          
+          .form-group
+            label(for='observacoes') Observações (opcional)
+            textarea#observacoes(name='observacoes', rows='3', placeholder='Alguma observação especial?')
+          
+          button.btn.btn-success(type='submit') ✓ Confirmar Reserva
+
+  //- Scripts do Flatpickr no final
+  script(src='https://cdn.jsdelivr.net/npm/flatpickr')
+  script(src='https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js')
+  script(src='/js/reservas.js')
