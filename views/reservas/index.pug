@@ -6,8 +6,36 @@ block content
     a.btn.btn-success(href='/reservas/create') + Nova Reserva
   
   .card
+    //- Filtro por Barbeiro
+    .filtro-section(style='margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;')
+      form(method='GET', action='/reservas', style='display: flex; gap: 10px; align-items: flex-end;')
+        .form-group(style='flex: 1; margin: 0;')
+          label(for='barbeiro_id') Filtrar por Barbeiro:
+          select#barbeiro_id(name='barbeiro_id', style='width: 100%;')
+            option(value='') Todos os Barbeiros
+            each barbeiro in barbeiros
+              option(value=barbeiro.id, selected=barbeiro_selecionado == barbeiro.id)= barbeiro.nome
+        
+        button.btn.btn-primary(type='submit', style='margin-bottom: 0;') 🔍 Filtrar
+        
+        if barbeiro_selecionado
+          a.btn.btn-secondary(href='/reservas', style='margin-bottom: 0;') ✖ Limpar Filtro
+    
+    //- Indicador de filtro ativo
+    if barbeiro_selecionado
+      .alert(style='background: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 4px; margin-bottom: 15px;')
+        | 🔍 Mostrando apenas reservas de: 
+        strong= barbeiros.find(b => b.id == barbeiro_selecionado).nome
+    
+    //- Tabela de Reservas
     if reservas.length === 0
-      p Nenhuma reserva registada.
+      if barbeiro_selecionado
+        p(style='text-align: center; color: #666; padding: 20px;')
+          | Nenhuma reserva encontrada para este barbeiro.
+          br
+          a(href='/reservas') Ver todas as reservas
+      else
+        p Nenhuma reserva registada.
     else
       table
         thead
@@ -25,8 +53,44 @@ block content
               td= reserva.cliente_nome
               td= reserva.barbeiro_nome
               td= reserva.servico_nome
-              td= reserva.estado
+              td
+                span(class=`badge badge-${reserva.estado}`)= reserva.estado
               td.actions
                 a.btn.btn-primary(href=`/reservas/${reserva.id}`) Ver
                 a.btn.btn-secondary(href=`/reservas/${reserva.id}/edit`) Editar
                 button.btn.btn-danger(onclick=`deleteItem('/reservas/${reserva.id}', 'Remover esta reserva?')`) Remover
+  
+  //- Estilos para badges de estado
+  style.
+    .badge {
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .badge-pendente {
+      background: #ffc107;
+      color: #000;
+    }
+    .badge-confirmada {
+      background: #28a745;
+      color: #fff;
+    }
+    .badge-concluída {
+      background: #007bff;
+      color: #fff;
+    }
+    .badge-cancelada {
+      background: #dc3545;
+      color: #fff;
+    }
+    .badge-não_compareceu {
+      background: #6c757d;
+      color: #fff;
+    }
+    .filtro-section label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }

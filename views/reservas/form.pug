@@ -37,8 +37,8 @@ block content
         
         .form-group
           label(for='data_hora') Data e Hora *
-          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora_formatada, step='1800', required)
-          small Horários disponíveis de 30 em 30 minutos (ex: 09:00, 09:30, 10:00...)
+          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora_formatada, required)
+          small Horários disponíveis de 30 em 30 minutos (09:00, 09:30, 10:00...)
         
         .form-group
           label(for='estado') Estado *

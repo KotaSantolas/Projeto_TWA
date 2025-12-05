@@ -6,13 +6,23 @@ const Barbeiro = require('../models/Barbeiro');
 const Servico = require('../models/Servico');
 
 const reservaController = {
-    // READ All - Lista todas as reservas
+    // READ All - Lista todas as reservas (com filtro opcional)
     index: async (req, res) => {
         try {
-            const reservas = await Reserva.findAll();
+            const { barbeiro_id } = req.query;
+            
+            // Buscar todos os barbeiros para o dropdown
+            const barbeiros = await Barbeiro.findAll();
+            
+            // Buscar reservas (filtradas ou todas)
+            const filtro = barbeiro_id ? { barbeiro_id } : {};
+            const reservas = await Reserva.findAll(filtro);
+            
             res.render('reservas/index', { 
                 title: 'Reservas',
-                reservas 
+                reservas,
+                barbeiros,
+                barbeiro_selecionado: barbeiro_id || ''
             });
         } catch (error) {
             console.error('Erro ao listar reservas:', error);
