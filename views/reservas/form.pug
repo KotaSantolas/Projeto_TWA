@@ -15,7 +15,7 @@ block content
 
   .card
     if reserva
-      //- MODO EDIÇÃO: Formulário tradicional
+      //- MODO EDIÇÃO: Formulário tradicional com data pré-preenchida
       form(action=`/reservas/${reserva.id}`, method='POST')
         p 
           strong Cliente: 
@@ -37,7 +37,8 @@ block content
         
         .form-group
           label(for='data_hora') Data e Hora *
-          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora, required)
+          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora_formatada, step='1800', required)
+          small Horários disponíveis de 30 em 30 minutos (ex: 09:00, 09:30, 10:00...)
         
         .form-group
           label(for='estado') Estado *
@@ -53,6 +54,108 @@ block content
           textarea#observacoes(name='observacoes', rows='3')= reserva.observacoes || ''
         
         button.btn.btn-success(type='submit') Atualizar
+      
+      //- Script de validação para horários no modo edição
+      script.
+        document.addEventListener('DOMContentLoaded', function() {
+          const dataHoraInput = document.getElementById('data_hora');
+          
+          if (dataHoraInput) {
+            // Definir data mínima como hoje
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const hora = String(hoje.getHours()).padStart(2, '0');
+            const minuto = String(hoje.getMinutes()).padStart(2, '0');
+            
+            // Formato: YYYY-MM-DDTHH:MM
+            const dataMinima = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+            dataHoraInput.setAttribute('min', dataMinima);
+            
+            // Validar ao submeter o formulário
+            dataHoraInput.closest('form').addEventListener('submit', function(e) {
+              const valor = dataHoraInput.value;
+              
+              if (valor) {
+                const dataSelecionada = new Date(valor);
+                const agora = new Date();
+                
+                // Verificar se é data passada
+                if (dataSelecionada < agora) {
+                  e.preventDefault();
+                  alert('Não é possível agendar para uma data/hora passada.');
+                  dataHoraInput.focus();
+                  return false;
+                }
+                
+                const minutos = dataSelecionada.getMinutes();
+                
+                // Permitir apenas minutos 00 ou 30
+                if (minutos !== 0 && minutos !== 30) {
+                  e.preventDefault();
+                  alert('Por favor, escolha um horário com minutos :00 ou :30 (ex: 09:00, 09:30, 10:00...)');
+                  dataHoraInput.focus();
+                  return false;
+                }
+                
+                // Validar horário de funcionamento (09:00 - 19:00)
+                const hora = dataSelecionada.getHours();
+                if (hora < 9 || hora >= 19) {
+                  e.preventDefault();
+                  alert('Por favor, escolha um horário entre 09:00 e 19:00');
+                  dataHoraInput.focus();
+                  return false;
+                }
+                
+                // Validar pausa de almoço (12:00 - 13:00)
+                if (hora === 12) {
+                  e.preventDefault();
+                  alert('Não é possível agendar durante a pausa de almoço (12:00 - 13:00)');
+                  dataHoraInput.focus();
+                  return false;
+                }
+                
+                // Validar domingo (0 = domingo)
+                const diaSemana = dataSelecionada.getDay();
+                if (diaSemana === 0) {
+                  e.preventDefault();
+                  alert('A barbearia está fechada aos domingos.');
+                  dataHoraInput.focus();
+                  return false;
+                }
+              }
+            });
+            
+            // Corrigir automaticamente ao sair do campo
+            dataHoraInput.addEventListener('blur', function() {
+              const valor = this.value;
+              
+              if (valor) {
+                const data = new Date(valor);
+                const minutos = data.getMinutes();
+                
+                // Se não for :00 ou :30, arredondar para o mais próximo
+                if (minutos !== 0 && minutos !== 30) {
+                  const minutosCorrigidos = minutos < 30 ? 0 : 30;
+                  data.setMinutes(minutosCorrigidos);
+                  data.setSeconds(0);
+                  data.setMilliseconds(0);
+                  
+                  // Formatar de volta para datetime-local
+                  const ano = data.getFullYear();
+                  const mes = String(data.getMonth() + 1).padStart(2, '0');
+                  const dia = String(data.getDate()).padStart(2, '0');
+                  const hora = String(data.getHours()).padStart(2, '0');
+                  const min = String(data.getMinutes()).padStart(2, '0');
+                  
+                  this.value = `${ano}-${mes}-${dia}T${hora}:${min}`;
+                }
+              }
+            });
+          }
+        });
+
 
     else
       //- MODO CRIAÇÃO: Sistema de calendário em 3 passos

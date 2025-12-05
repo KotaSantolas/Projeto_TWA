@@ -201,6 +201,22 @@ const reservaController = {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
             
+            // Formatar data_hora para o formato datetime-local (YYYY-MM-DDTHH:MM)
+            // MySQL retorna: "2024-12-10 14:30:00"
+            // HTML5 precisa: "2024-12-10T14:30"
+            if (reserva.data_hora) {
+                const dataObj = new Date(reserva.data_hora);
+                // Extrair componentes da data
+                const ano = dataObj.getFullYear();
+                const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+                const dia = String(dataObj.getDate()).padStart(2, '0');
+                const hora = String(dataObj.getHours()).padStart(2, '0');
+                const minuto = String(dataObj.getMinutes()).padStart(2, '0');
+                
+                // Formato: YYYY-MM-DDTHH:MM
+                reserva.data_hora_formatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+            }
+            
             const clientes = await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
@@ -241,6 +257,97 @@ const reservaController = {
         }
 
         try {
+            // Validar formato de data e minutos (00 ou 30)
+            const dataObj = new Date(data_hora);
+            const agora = new Date();
+            const minutos = dataObj.getMinutes();
+            const hora = dataObj.getHours();
+            const diaSemana = dataObj.getDay();
+            
+            // Validar se é data passada
+            if (dataObj < agora) {
+                const reserva = await Reserva.findById(id);
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'Não é possível agendar para uma data/hora passada',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos 
+                });
+            }
+            
+            if (minutos !== 0 && minutos !== 30) {
+                const reserva = await Reserva.findById(id);
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'Horário inválido. Escolha minutos :00 ou :30',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos 
+                });
+            }
+            
+            // Validar horário de funcionamento (09:00 - 19:00)
+            if (hora < 9 || hora >= 19) {
+                const reserva = await Reserva.findById(id);
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'Horário fora do expediente. Funcionamento: 09:00 - 19:00',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos 
+                });
+            }
+            
+            // Validar pausa de almoço
+            if (hora === 12) {
+                const reserva = await Reserva.findById(id);
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'Não é possível agendar durante a pausa de almoço (12:00 - 13:00)',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos 
+                });
+            }
+            
+            // Validar domingo (0 = domingo)
+            if (diaSemana === 0) {
+                const reserva = await Reserva.findById(id);
+                const clientes = await Cliente.findAll();
+                const barbeiros = await Barbeiro.findAll();
+                const servicos = await Servico.findAll(true);
+                
+                return res.render('reservas/form', { 
+                    title: 'Editar Reserva',
+                    error: 'A barbearia está fechada aos domingos',
+                    reserva: { ...reserva, ...req.body },
+                    clientes,
+                    barbeiros,
+                    servicos 
+                });
+            }
+            
             // Verifica disponibilidade (excluindo a própria reserva)
             const servico = await Servico.findById(opcao_id);
             const isAvailable = await Reserva.isAvailable(barbeiro_id, data_hora, servico.duracao_min, id);
