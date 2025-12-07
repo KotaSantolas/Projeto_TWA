@@ -9,28 +9,72 @@ block content
     //- CLIENTES veem apenas Reservas
     if userType === 'cliente'
       .dashboard-card
-        h2 📅
+        i.fa-solid.fa-calendar-days.dashboard-icon
         p As Minhas Reservas
-        a(href='/reservas') Ver todas
+        a(href='/reservas') Ver todas →
     
     //- BARBEIROS veem tudo
     else if userType === 'barbeiro'
-      .dashboard-card
-        h2 👥
+      .dashboard-card.card-clientes
+        i.fa-solid.fa-users.dashboard-icon
         p Clientes
-        a(href='/clientes') Ver todos
+        a(href='/clientes') Ver todos →
       
-      .dashboard-card
-        h2 ✂️
+      .dashboard-card.card-barbeiros
+        i.fa-solid.fa-scissors.dashboard-icon
         p Barbeiros
-        a(href='/barbeiros') Ver todos
+        a(href='/barbeiros') Ver todos →
       
-      .dashboard-card
-        h2 💈
+      .dashboard-card.card-servicos
+        i.fa-solid.fa-spa.dashboard-icon
         p Serviços
-        a(href='/servicos') Ver todos
+        a(href='/servicos') Ver todos →
       
-      .dashboard-card
-        h2 📅
+      .dashboard-card.card-reservas
+        i.fa-solid.fa-calendar-check.dashboard-icon
         p Reservas
-        a(href='/reservas') Ver todas
+        a(href='/reservas') Ver todas →
+
+  style.
+    /* Estilos para os ícones Font Awesome */
+    .dashboard-icon {
+      font-size: 4rem;
+      margin: 0 auto 1.5rem;
+      display: block;
+      transition: all var(--transition-base);
+    }
+    
+    /* Cores diferentes para cada card */
+    .card-clientes .dashboard-icon {
+      color: #6366f1;
+    }
+    
+    .card-barbeiros .dashboard-icon {
+      color: #8b5cf6;
+    }
+    
+    .card-servicos .dashboard-icon {
+      color: #ec4899;
+    }
+    
+    .card-reservas .dashboard-icon {
+      color: #3b82f6;
+    }
+    
+    /* Animação no hover */
+    .dashboard-card:hover .dashboard-icon {
+      transform: scale(1.15) rotate(5deg);
+      filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+    }
+    
+    /* Ajustar texto */
+    .dashboard-card p {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+    }
+    
+    .dashboard-card a {
+      font-size: 1rem;
+    }
