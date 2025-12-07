@@ -37,8 +37,14 @@ block content
         
         .form-group
           label(for='data_hora') Data e Hora *
-          input#data_hora(type='datetime-local', name='data_hora', value=reserva.data_hora_formatada, required)
-          small Horários disponíveis de 30 em 30 minutos (09:00, 09:30, 10:00...)
+          input#data_hora(
+            type='datetime-local', 
+            name='data_hora', 
+            value=reserva.data_hora_formatada, 
+            data-original=reserva.data_hora_formatada,
+            required
+          )
+          small Horários disponíveis de 30 em 30 minutos (09:00, 09:30, 10:00...). Pode manter a data original mesmo sendo passada.
         
         .form-group
           label(for='estado') Estado *
@@ -55,23 +61,17 @@ block content
         
         button.btn.btn-success(type='submit') Atualizar
       
-      //- Script de validação para horários no modo edição
+      //- Script de validação INTELIGENTE para horários no modo edição
       script.
         document.addEventListener('DOMContentLoaded', function() {
           const dataHoraInput = document.getElementById('data_hora');
           
           if (dataHoraInput) {
-            // Definir data mínima como hoje
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            const hora = String(hoje.getHours()).padStart(2, '0');
-            const minuto = String(hoje.getMinutes()).padStart(2, '0');
+            // Guardar a data original
+            const dataOriginal = dataHoraInput.getAttribute('data-original');
             
-            // Formato: YYYY-MM-DDTHH:MM
-            const dataMinima = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-            dataHoraInput.setAttribute('min', dataMinima);
+            // NÃO definir min - permite qualquer data
+            // Validação será feita no submit
             
             // Validar ao submeter o formulário
             dataHoraInput.closest('form').addEventListener('submit', function(e) {
@@ -81,10 +81,12 @@ block content
                 const dataSelecionada = new Date(valor);
                 const agora = new Date();
                 
-                // Verificar se é data passada
-                if (dataSelecionada < agora) {
+                // NOVA LÓGICA: Só bloquear se for data passada E diferente da original
+                const dataFoiAlterada = valor !== dataOriginal;
+                
+                if (dataFoiAlterada && dataSelecionada < agora) {
                   e.preventDefault();
-                  alert('Não é possível agendar para uma data/hora passada.');
+                  alert('❌ Não é possível alterar para uma data/hora passada.\\n\\n💡 Sugestão: Mantenha a data original ou escolha uma data futura.');
                   dataHoraInput.focus();
                   return false;
                 }
