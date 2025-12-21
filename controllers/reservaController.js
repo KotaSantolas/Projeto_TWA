@@ -6,16 +6,28 @@ const Barbeiro = require('../models/Barbeiro');
 const Servico = require('../models/Servico');
 
 const reservaController = {
-    // READ All - Lista todas as reservas (com filtro opcional)
+    // READ All - Lista todas as reservas (com filtro opcional + segurança para clientes)
     index: async (req, res) => {
         try {
             const { barbeiro_id } = req.query;
             
-            // Buscar todos os barbeiros para o dropdown
+            // Buscar todos os barbeiros para o dropdown (TODOS podem filtrar)
             const barbeiros = await Barbeiro.findAll();
             
-            // Buscar reservas (filtradas ou todas)
-            const filtro = barbeiro_id ? { barbeiro_id } : {};
+            // Construir filtro
+            let filtro = {};
+            
+            // Se for CLIENTE, mostrar apenas suas reservas
+            if (req.session.userType === 'cliente') {
+                filtro.cliente_id = req.session.userId;
+            }
+            
+            // Filtro de barbeiro (disponível para AMBOS: cliente E barbeiro)
+            if (barbeiro_id) {
+                filtro.barbeiro_id = barbeiro_id;
+            }
+            
+            // Buscar reservas com filtro aplicado
             const reservas = await Reserva.findAll(filtro);
             
             res.render('reservas/index', { 
@@ -30,7 +42,7 @@ const reservaController = {
         }
     },
 
-    // READ One - Detalhes de uma reserva
+    // READ One - Detalhes de uma reserva (com verificação de permissão)
     show: async (req, res) => {
         const { id } = req.params;
         try {
@@ -38,6 +50,14 @@ const reservaController = {
             if (!reserva) {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
+            
+            // SEGURANÇA: Clientes só podem ver suas próprias reservas
+            if (req.session.userType === 'cliente' && reserva.cliente_id != req.session.userId) {
+                return res.status(403).render('error', { 
+                    message: 'Acesso negado. Só podes ver as tuas próprias reservas.' 
+                });
+            }
+            
             res.render('reservas/show', { 
                 title: `Reserva #${reserva.id}`,
                 reserva 
@@ -123,7 +143,17 @@ const reservaController = {
     // GET - Formulário para criar
     getCreateForm: async (req, res) => {
         try {
-            const clientes = await Cliente.findAll();
+            // Clientes só podem criar reservas para si mesmos
+            let clientes;
+            if (req.session.userType === 'cliente') {
+                // Buscar apenas o cliente logado
+                const cliente = await Cliente.findById(req.session.userId);
+                clientes = cliente ? [cliente] : [];
+            } else {
+                // Barbeiros veem todos os clientes
+                clientes = await Cliente.findAll();
+            }
+            
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true); // Apenas ativos
             
@@ -143,11 +173,18 @@ const reservaController = {
 
     // CREATE - Cria nova reserva
     create: async (req, res) => {
-        const { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
+        let { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
+
+        // SEGURANÇA: Se for cliente, forçar o cliente_id para o id do usuário logado
+        if (req.session.userType === 'cliente') {
+            cliente_id = req.session.userId;
+        }
 
         // Validações básicas
         if (!cliente_id || !barbeiro_id || !opcao_id || !data_hora) {
-            const clientes = await Cliente.findAll();
+            const clientes = req.session.userType === 'cliente' 
+                ? [await Cliente.findById(req.session.userId)]
+                : await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
             
@@ -167,7 +204,9 @@ const reservaController = {
             const isAvailable = await Reserva.isAvailable(barbeiro_id, data_hora, servico.duracao_min);
             
             if (!isAvailable) {
-                const clientes = await Cliente.findAll();
+                const clientes = req.session.userType === 'cliente'
+                    ? [await Cliente.findById(req.session.userId)]
+                    : await Cliente.findAll();
                 const barbeiros = await Barbeiro.findAll();
                 const servicos = await Servico.findAll(true);
                 
@@ -187,7 +226,9 @@ const reservaController = {
         } catch (error) {
             console.error('Erro ao criar reserva:', error);
             
-            const clientes = await Cliente.findAll();
+            const clientes = req.session.userType === 'cliente'
+                ? [await Cliente.findById(req.session.userId)]
+                : await Cliente.findAll();
             const barbeiros = await Barbeiro.findAll();
             const servicos = await Servico.findAll(true);
             
@@ -202,13 +243,20 @@ const reservaController = {
         }
     },
 
-    // GET - Formulário para editar
+    // GET - Formulário para editar (com verificação de permissão)
     getEditForm: async (req, res) => {
         const { id } = req.params;
         try {
             const reserva = await Reserva.findById(id);
             if (!reserva) {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
+            }
+            
+            // SEGURANÇA: Clientes só podem editar suas próprias reservas
+            if (req.session.userType === 'cliente' && reserva.cliente_id != req.session.userId) {
+                return res.status(403).render('error', { 
+                    message: 'Acesso negado. Só podes editar as tuas próprias reservas.' 
+                });
             }
             
             // Formatar data_hora para o formato datetime-local (YYYY-MM-DDTHH:MM)
@@ -241,10 +289,23 @@ const reservaController = {
         }
     },
 
-    // UPDATE - Atualiza reserva
+    // UPDATE - Atualiza reserva (com verificação de permissão)
     update: async (req, res) => {
         const { id } = req.params;
         const { data_hora, barbeiro_id, opcao_id, estado, observacoes } = req.body;
+
+        // Buscar reserva original
+        const reservaOriginal = await Reserva.findById(id);
+        if (!reservaOriginal) {
+            return res.status(404).render('error', { message: 'Reserva não encontrada' });
+        }
+        
+        // SEGURANÇA: Clientes só podem editar suas próprias reservas
+        if (req.session.userType === 'cliente' && reservaOriginal.cliente_id != req.session.userId) {
+            return res.status(403).render('error', { 
+                message: 'Acesso negado. Só podes editar as tuas próprias reservas.' 
+            });
+        }
 
         if (!data_hora || !barbeiro_id || !opcao_id || !estado) {
             const reserva = await Reserva.findById(id);
@@ -263,29 +324,22 @@ const reservaController = {
         }
 
         try {
-            // Buscar reserva original para comparar data
-            const reservaOriginal = await Reserva.findById(id);
-            if (!reservaOriginal) {
-                return res.status(404).render('error', { message: 'Reserva não encontrada' });
-            }
-            
             // Formatar data original para comparação
             const dataOriginalObj = new Date(reservaOriginal.data_hora);
-            const dataOriginalFormatada = dataOriginalObj.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+            const dataOriginalFormatada = dataOriginalObj.toISOString().slice(0, 16);
             
-            // Validar formato de data e minutos (00 ou 30)
+            // Validar formato de data e minutos
             const dataObj = new Date(data_hora);
             const agora = new Date();
             const minutos = dataObj.getMinutes();
             const hora = dataObj.getHours();
             const diaSemana = dataObj.getDay();
             
-            // NOVA LÓGICA: Validar data passada APENAS se a data foi alterada
+            // Validar data passada APENAS se a data foi alterada
             const dataNovaFormatada = dataObj.toISOString().slice(0, 16);
             const dataFoiAlterada = dataOriginalFormatada !== dataNovaFormatada;
             
             if (dataFoiAlterada && dataObj < agora) {
-                // Se tentou mudar para uma data passada diferente da original
                 const reserva = await Reserva.findById(id);
                 const clientes = await Cliente.findAll();
                 const barbeiros = await Barbeiro.findAll();
@@ -352,7 +406,7 @@ const reservaController = {
                 });
             }
             
-            // Validar domingo (0 = domingo)
+            // Validar domingo
             if (diaSemana === 0) {
                 const reserva = await Reserva.findById(id);
                 const clientes = await Cliente.findAll();
@@ -411,10 +465,23 @@ const reservaController = {
         }
     },
 
-    // DELETE - Remove reserva
+    // DELETE - Remove reserva (com verificação de permissão)
     delete: async (req, res) => {
         const { id } = req.params;
         try {
+            const reserva = await Reserva.findById(id);
+            if (!reserva) {
+                return res.status(404).json({ success: false, message: 'Reserva não encontrada' });
+            }
+            
+            // SEGURANÇA: Clientes só podem eliminar suas próprias reservas
+            if (req.session.userType === 'cliente' && reserva.cliente_id != req.session.userId) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Acesso negado. Só podes eliminar as tuas próprias reservas.' 
+                });
+            }
+            
             const affectedRows = await Reserva.delete(id);
             if (affectedRows > 0) {
                 res.json({ success: true, message: 'Reserva removida com sucesso' });
