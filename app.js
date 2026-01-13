@@ -1,5 +1,3 @@
-// ./app.js
-
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -59,7 +57,7 @@ async function initializeDatabase() {
 // Inicializa o DB
 initializeDatabase();
 
-// ---------------------- ROTAS ----------------------
+// Rotas
 
 // Importar rotas
 const authRouter = require('./routes/auth');
@@ -102,6 +100,6 @@ app.use((err, req, res, next) => {
 
 // Inicia o Servidor
 app.listen(port, () => {
-    console.log(`\n🚀 Servidor a correr em http://localhost:${port}`);
-    console.log(`📝 Login em http://localhost:${port}/auth/login\n`);
+    console.log(`\nServidor a correr em http://localhost:${port}`);
+    console.log(`Login em http://localhost:${port}/auth/login\n`);
 });
