@@ -1,6 +1,3 @@
-// ============================================
-// SISTEMA DE GESTÃO DE BARBEARIA - JavaScript
-// ============================================
 
 /**
  * Função para eliminar itens com confirmação

@@ -1,5 +1,3 @@
-// ./public/js/reservas.js
-
 document.addEventListener('DOMContentLoaded', function() {
     
     // Elementos do DOM

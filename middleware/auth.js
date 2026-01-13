@@ -1,6 +1,4 @@
-// ./middleware/auth.js
-
-// Middleware para verificar se o utilizador está autenticado (cliente OU barbeiro)
+// Middleware para verificar se o utilizador está autenticado (cliente ou barbeiro)
 const requireAuth = (req, res, next) => {
     if (!req.session || !req.session.userId || !req.session.userType) {
         return res.redirect('/auth/login');
@@ -30,7 +28,7 @@ const requireBarbeiro = (req, res, next) => {
     next();
 };
 
-// Middleware para permitir AMBOS (clientes E barbeiros)
+// Middleware para permitir ambos (clientes e barbeiros)
 const requireClienteOrBarbeiro = (req, res, next) => {
     if (!req.session || !req.session.userId || !req.session.userType) {
         return res.redirect('/auth/login');

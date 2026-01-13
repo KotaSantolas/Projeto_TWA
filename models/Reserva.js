@@ -1,5 +1,3 @@
-// ./models/Reserva.js
-
 const db = require('../config/database');
 
 const Reserva = {

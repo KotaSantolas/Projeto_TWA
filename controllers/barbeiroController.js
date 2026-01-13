@@ -1,5 +1,3 @@
-// ./controllers/barbeiroController.js
-
 const Barbeiro = require('../models/Barbeiro');
 const fs = require('fs/promises');
 const path = require('path');
@@ -142,7 +140,7 @@ const barbeiroController = {
         }
     },
 
-    // DELETE (RESTRICT impedirá se tiver reservas)
+    // DELETE (restrict impedirá se tiver reservas)
     delete: async (req, res) => {
         const { id } = req.params;
         try {

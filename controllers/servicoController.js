@@ -1,5 +1,3 @@
-// ./controllers/servicoController.js
-
 const Servico = require('../models/Servico');
 
 const servicoController = {
@@ -136,7 +134,7 @@ const servicoController = {
         }
     },
 
-    // DELETE - Remove serviço (RESTRICT impedirá se tiver reservas)
+    // DELETE - Remove serviço (restrict impedirá se tiver reservas)
     delete: async (req, res) => {
         const { id } = req.params;
         try {

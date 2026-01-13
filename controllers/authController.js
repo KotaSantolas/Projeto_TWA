@@ -1,5 +1,3 @@
-// ./controllers/authController.js
-
 const Cliente = require('../models/Cliente');
 const Barbeiro = require('../models/Barbeiro');
 const bcrypt = require('bcrypt');
@@ -13,7 +11,7 @@ const authController = {
         });
     },
 
-    // POST - Processar login (CLIENTE OU BARBEIRO)
+    // POST - Processar login (cliente OU barbeiro)
     postLogin: async (req, res) => {
         const { email, password, userType } = req.body;
 
@@ -79,7 +77,7 @@ const authController = {
         }
     },
 
-    // GET - Formulário de registo (APENAS CLIENTES)
+    // GET - Formulário de registo (apenas clientes)
     getRegister: (req, res) => {
         res.render('auth/register', { 
             title: 'Registar',
@@ -87,7 +85,7 @@ const authController = {
         });
     },
 
-    // POST - Processar registo (APENAS CLIENTES)
+    // POST - Processar registo (apenas clientes)
     postRegister: async (req, res) => {
         const { primeiro_nome, ultimo_nome, email, password, password_confirm, telefone } = req.body;
 
@@ -119,7 +117,7 @@ const authController = {
         try {
             const id = await Cliente.create(primeiro_nome, ultimo_nome, email, password, telefone);
             
-            // Login automático após registo (SEMPRE como cliente)
+            // Login automático após registo (sempre como cliente)
             req.session.userId = id;
             req.session.userName = `${primeiro_nome} ${ultimo_nome}`;
             req.session.userType = 'cliente';

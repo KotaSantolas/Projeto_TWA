@@ -1,5 +1,3 @@
-// ./models/Servico.js
-
 const db = require('../config/database');
 
 const Servico = {

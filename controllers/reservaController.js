@@ -1,5 +1,3 @@
-// ./controllers/reservaController.js
-
 const Reserva = require('../models/Reserva');
 const Cliente = require('../models/Cliente');
 const Barbeiro = require('../models/Barbeiro');
@@ -11,13 +9,13 @@ const reservaController = {
         try {
             const { barbeiro_id } = req.query;
             
-            // Buscar todos os barbeiros para o dropdown (TODOS podem filtrar)
+            // Buscar todos os barbeiros para o dropdown (todos podem filtrar)
             const barbeiros = await Barbeiro.findAll();
             
             // Construir filtro
             let filtro = {};
             
-            // Se for CLIENTE, mostrar apenas suas reservas
+            // Se for cliente, mostrar apenas suas reservas
             if (req.session.userType === 'cliente') {
                 filtro.cliente_id = req.session.userId;
             }
@@ -51,7 +49,7 @@ const reservaController = {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
             
-            // SEGURANÇA: Clientes só podem ver suas próprias reservas
+            // Clientes só podem ver suas próprias reservas
             if (req.session.userType === 'cliente' && reserva.cliente_id != req.session.userId) {
                 return res.status(403).render('error', { 
                     message: 'Acesso negado. Só podes ver as tuas próprias reservas.' 
@@ -175,7 +173,7 @@ const reservaController = {
     create: async (req, res) => {
         let { cliente_id, barbeiro_id, opcao_id, data_hora, observacoes } = req.body;
 
-        // SEGURANÇA: Se for cliente, forçar o cliente_id para o id do usuário logado
+        // Se for cliente, forçar o cliente_id para o id do usuário logado
         if (req.session.userType === 'cliente') {
             cliente_id = req.session.userId;
         }
@@ -252,7 +250,7 @@ const reservaController = {
                 return res.status(404).render('error', { message: 'Reserva não encontrada' });
             }
             
-            // SEGURANÇA: Clientes só podem editar suas próprias reservas
+            // Clientes só podem editar suas próprias reservas
             if (req.session.userType === 'cliente' && reserva.cliente_id != req.session.userId) {
                 return res.status(403).render('error', { 
                     message: 'Acesso negado. Só podes editar as tuas próprias reservas.' 
@@ -300,7 +298,7 @@ const reservaController = {
             return res.status(404).render('error', { message: 'Reserva não encontrada' });
         }
         
-        // SEGURANÇA: Clientes só podem editar suas próprias reservas
+        // Clientes só podem editar suas próprias reservas
         if (req.session.userType === 'cliente' && reservaOriginal.cliente_id != req.session.userId) {
             return res.status(403).render('error', { 
                 message: 'Acesso negado. Só podes editar as tuas próprias reservas.' 
