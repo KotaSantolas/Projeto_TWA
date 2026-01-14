@@ -158,7 +158,10 @@ SESSION_SECRET=gerar_uma_chave_aleatoria_longa_aqui
 
 ```bash
 npm start
+/
+node app.js
 ```
+
 
 A aplicação estará disponível em: **http://localhost:3000**
 
